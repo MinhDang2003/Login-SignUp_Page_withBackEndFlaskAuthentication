@@ -1,0 +1,4 @@
+input[type="password"]#password_confirmed::-ms-reveal,
+input[type="password"]#password_confirmed::-ms-clear {
+  display: none;
+}
