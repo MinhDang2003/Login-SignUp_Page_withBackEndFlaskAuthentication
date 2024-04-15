@@ -3,8 +3,8 @@ import random
 import sys
 import time
 from Server.Backend.Model.Database.MongoSetup import MongoAPI
-ADAFRUIT_IO_KEY = 'aio_zhAN25q4wdDkS4AigW0RH7JvsdNG'
-ADAFRUIT_IO_USERNAME = 'dangquocminh03'
+ADAFRUIT_IO_KEY = 'YOUR_KEY'
+ADAFRUIT_IO_USERNAME = 'YOUR_USERNAME'
 ADAFRUIT_IO_URL = 'io.adafruit.com'
 
 IO_FEED_USERNAME = 'dangquocminh03'
