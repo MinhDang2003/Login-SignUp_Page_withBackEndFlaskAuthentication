@@ -6,6 +6,7 @@ import Layout from './component/Layout.tsx';
 import Missing from './pages/Missing.tsx';
 import RequireAuth from './component/RequireAuth.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import PersistLogin from './component/PersistLogin.tsx';
 function App() {
   
 
@@ -19,13 +20,15 @@ function App() {
             <Route path='/login' element={<Login></Login>}/>
             <Route path='/signup' element={<SignUp></SignUp>}/>
             {/* Protected */ }
-            <Route element={<RequireAuth></RequireAuth>}>
-              <Route path='/' element={<Home></Home>}/>
-              <Route path='*' element={<Missing></Missing>}/>
+            <Route element = {<PersistLogin></PersistLogin>}>
+              <Route element={<RequireAuth></RequireAuth>}>
+                <Route path='/' element={<Home></Home>}/>
+                <Route path='/Dashboard' element={<Dashboard></Dashboard>}/>
+              </Route>
             </Route>
-            <Route path='/Dashboard' element={<Dashboard></Dashboard>}/>
-            {/* catch all to Missing */ }
             
+            {/* catch all to Missing */ }
+            <Route path='*' element={<Missing></Missing>}/>
           </Route>
           
           

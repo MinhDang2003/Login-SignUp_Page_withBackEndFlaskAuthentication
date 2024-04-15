@@ -6,7 +6,7 @@ import {DevTool} from "@hookform/devtools"
 import {useNavigate,NavLink,useLocation} from "react-router-dom";
 import {axiosPublic} from '../api/axios';
 import axios ,{ AxiosError } from 'axios';
-import React,{useState } from 'react';
+import React,{useState,useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 // const color = {
 //    primary: "#060606",
@@ -19,7 +19,7 @@ type FormValues = {
     saved: boolean;
 }
 function Login() {
-    const {setAuth} = useAuth();
+    const {setAuth,persist,setPersist} = useAuth();
     const form = useForm({
         defaultValues: {
             email: "",
@@ -39,14 +39,14 @@ function Login() {
         if(isSubmitting) return;
         try {
             const response = await axiosPublic.post("/users/signin",{saved: data.saved,email: data.email,password: data.password} )
-            
-            setAuth({
-                token: response?.data?.token,
-                refresh: response?.data?.refresh,
+            setAuth((prev) => {
+                return {...prev, token: response?.data?.token}
             })
             
+            localStorage.setItem("persist",(data.saved).toString());
+            setPersist((data.saved))
+            
             reset()
-            console.log(location.state?.from?.pathname)
             navigate(from, {replace: true});
         } catch(error) {
             if (axios.isAxiosError(error)) {
@@ -67,7 +67,7 @@ function Login() {
         }
     };
 
-   
+    
     
     return(
         <div className= "w-screen h-screen flex items-start">
@@ -120,16 +120,16 @@ function Login() {
                             })} placeholder="Password" className='w-full text-black pl-1 py-4 my-2 bg-transparent border-b border-black outline-none focus:outline-none'></input>
                             <p className='text-sm pl-1 text-red-600 font-sans'>{errors.password?.message}</p>
                         </div>
-                        {/*
+                        
                         <div className='w-full flex items-center justify-between mt-3'>
                             <div className='w-full flex items-center '>
-                                <input type="checkbox" id="saved" {...register("saved")} className='w-4 h-4 mr-2'></input>
+                                <input type="checkbox"  id="saved" {...register("saved")} className='w-4 h-4 mr-2'></input>
                                 <p className ='text-sm'>Remember me</p>
                             </div>
 
                             <p className='text-sm font-medium whitespace-nowrap cursor-pointer underline underline-offset-2'>Forgot Password</p>
                         </div>
-                        */}
+                        
 
                         <div className='w-full flex flex-col my-4'>
                             <button type='submit' disabled={isSubmitting} className='w-full text-white my-2 font-semibold bg-[#060606] rounded-md p-4 text-center flex items-center justify-center cursor-pointer'>

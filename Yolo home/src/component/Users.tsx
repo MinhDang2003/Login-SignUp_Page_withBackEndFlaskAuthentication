@@ -2,48 +2,45 @@
 import { useState,useEffect } from "react";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useNavigate,useLocation } from "react-router-dom";
-import axios,{AxiosError} from "axios";
+import axios,{CancelTokenSource} from "axios";
+import useAuth from "../hooks/useAuth";
 
-function Users() {
-    const [users,setUsers] = useState({name: "",about: ""});
+interface UserInfo {
+    name: string;
+    about: string;
+  }
+  
+
+function Users() : JSX.Element  {
+    const {auth} = useAuth();
+    const [users,setUsers] = useState<UserInfo |null>(null);
     const axiosPrivate = useAxiosPrivate();const navigate = useNavigate();const location = useLocation();
     useEffect(() => {
-        //let isMounted = true;
-        //const controller = new AbortController();
-        
-
-
-        const getUsers = async() => {
-            try {
-                const response = await axiosPrivate.get("/users/profile", {
-                    
-                    
-                })
-                console.log(response?.data)
-                setUsers({name: response?.data?.user?.name , about: response?.data?.user?.about})
-                //isMounted && setUsers({name: response?.data?.user?.name , about: response?.data?.user?.about})
-            } catch(error) {
-                if (axios.isAxiosError(error)) {
-                    
-                    const axiosError = error as AxiosError;
-                    console.error(axiosError)
-                }
+        const source: CancelTokenSource = axios.CancelToken.source();
+        axiosPrivate.get("/users/profile", {
+            cancelToken: source.token,
+        })
+        .then((res) => {setUsers(res?.data?.user)})
+        .catch((thrown) => {
+            if (axios.isCancel(thrown)) {
+                console.log('Request canceled');
+            } else {                    
                 navigate('/login', { state: { from: location }, replace: true });
-            }
-        }
 
-        getUsers();
+            }
+
+            
+        })
         
         return () => {
-            //isMounted = false;
-            //controller.abort();
+            source.cancel();
         }
-    },[])
+    },[axiosPrivate,navigate,location,auth.token])
 
     return (
         <article>
             {
-                users?.name ? (
+                users ? (
                     <h2>Hello {users?.name} <br></br> {users?.about}</h2>
                 ) : <p> Nothing to display</p>
             }

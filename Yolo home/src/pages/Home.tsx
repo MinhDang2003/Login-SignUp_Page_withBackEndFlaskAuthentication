@@ -1,30 +1,15 @@
 import { useNavigate, Link } from "react-router-dom";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthProvide";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import axios,{AxiosError} from "axios";
+import useLogout from "../hooks/useLogout";
+
 function Home() {
-    const { setAuth } = useContext(AuthContext);
+    
     const navigate = useNavigate();
-    const axiosPrivate = useAxiosPrivate();
-    const logout = async () => {
-        // if used in more components, this should be in context 
-        // axios to /logout endpoint
-        try {
-            const response = await axiosPrivate.post("/users/logout")
-            console.log(response?.data)
-            setAuth({token: "",refresh:""});
-            navigate('/login');
-        } catch(error) {
-            if (axios.isAxiosError(error)) {
-                    
-                const axiosError = error as AxiosError;
-                console.error(axiosError)
-            }
-            setAuth({token: "",refresh:""});
-            navigate('/login');
-        }
-        
+    
+    const logout = useLogout();
+
+    const signOut = async () => {
+        await logout();
+        navigate('/login');
     }
 
     return (
@@ -36,7 +21,7 @@ function Home() {
             <Link to="/Dashboard">Go to the Dashboard</Link>
             <br />
             <div className="flexGrow">
-                <button onClick={logout}>Sign Out</button>
+                <button onClick={signOut}>Log Out</button>
             </div>
         </section>
     )

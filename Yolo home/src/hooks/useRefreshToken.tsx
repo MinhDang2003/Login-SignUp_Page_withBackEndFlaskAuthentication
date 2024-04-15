@@ -1,14 +1,13 @@
 
 import axios, {AxiosError} from "axios";
 import useAuth from "./useAuth";
-
+import { axiosPublic } from "../api/axios";
 const useRefreshToken = () => {
-    const {auth,setAuth} = useAuth();
+    const {setAuth} = useAuth();
     const refresh = async () => {
         try {
-            const response = await axios.get('http://127.0.0.1:8090/users/refresh', {withCredentials: true, headers: {'Authorization': `Bearer ${auth?.refresh}`,'Content-Type': 'application/json'}}) ;
+            const response = await axiosPublic.get('/users/refresh', {withCredentials: true, headers: {'Content-Type': 'application/json'}}) ;
             setAuth((prev) => {
-                
                 return {...prev, token: response?.data?.token}
             })
             return response?.data?.token
@@ -17,7 +16,6 @@ const useRefreshToken = () => {
                 const axiosError = error as AxiosError;
                 if (axiosError.response?.status === 402) {console.log(axiosError.response?.data?.msg);console.error(axiosError)}
                 else {console.error(axiosError);}
-                
             }
             else {
                 console.log("ANOTHER")
