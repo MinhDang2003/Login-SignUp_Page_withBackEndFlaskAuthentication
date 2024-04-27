@@ -5,7 +5,9 @@ import Sidebar from "../component/Sidebar";
 function Dashboard() {
 	return (
 		<div className="flex">
-			<Sidebar />
+			<aside className="w-1/3">
+				<Sidebar />
+			</aside>
 			<section className="flex-grow p-6">
 				<h1>Dashboard</h1>
 				<br />
