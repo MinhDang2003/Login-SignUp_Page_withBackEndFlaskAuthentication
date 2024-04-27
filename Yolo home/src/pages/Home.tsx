@@ -16,7 +16,7 @@ function Home() {
         <section>
             <h1>Home</h1>
             <br />
-            <p>You are logged in!</p>
+            <p >You are logged in!</p>
             <br />
             <Link to="/Dashboard">Go to the Dashboard</Link>
             <br />
