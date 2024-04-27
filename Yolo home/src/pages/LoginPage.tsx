@@ -77,7 +77,7 @@ function Login() {
 	};
 
 	return (
-		<div className="w-screen h-screen flex items-start">
+		<div className="w-screen h-screen flex items-start font-poppins">
 			<div className="relative w-2/3 h-full flex flex-col">
 				<div className="absolute top-[10%] left-[12%] flex flex-col">
 					<h1 className="text-6xl text-white font-bold my-4">YoloHome</h1>
@@ -87,7 +87,7 @@ function Login() {
 				</div>
 				<img src={COVER_IMAGE} className="w-full h-full object-cover" />
 			</div>
-			<div className="w-1/2 h-full bg-[#faf0dc] flex flex-col pt-10 pl-[44px] p-20 justify-center">
+			<div className="w-1/2 h-full bg-[#faf0dc] flex flex-col pt-10 pl-[44px] p-20 justify-center font-poppins">
 				<div className="w-full flex flex-row items-center ">
 					<img src={HCMUTlogo} className="h-12 mr-6" />
 					<h1 className="text-3xl text-[#060606] font-semibold">
