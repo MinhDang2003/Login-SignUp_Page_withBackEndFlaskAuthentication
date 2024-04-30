@@ -77,7 +77,7 @@ function Login() {
 	};
 
 	return (
-		<div className="w-screen h-screen flex items-start font-poppins">
+		<div className="w-screen h-screen flex items-start ">
 			<div className="relative w-2/3 h-full flex flex-col">
 				<div className="absolute top-[10%] left-[12%] flex flex-col">
 					<h1 className="text-6xl text-white font-bold my-4">YoloHome</h1>

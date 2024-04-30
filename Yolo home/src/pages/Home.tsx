@@ -1,8 +1,7 @@
-import { useNavigate, Link } from "react-router-dom";
-import useLogout from "../hooks/useLogout";
 import { useState } from "react";
 import "../App.css";
-import HCMUTlogo from '../assets/OIP.png';
+import Sidebar from "../component/Sidebar";
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -20,16 +19,6 @@ ChartJS.register(
 );
 
 function Home() {
-    
-    const navigate = useNavigate();
-    
-    const logout = useLogout();
-
-    const signOut = async () => {
-        await logout();
-        navigate('/login');
-    }
-
     const stateList = ["Temperature", "Moisture", "Light"];
     const modeList = ["Day", "Week", "Month"];
 
@@ -202,20 +191,10 @@ function Home() {
 
     return (
         <div className="w-screen h-screen flex items-start">
-            <nav className="fixed top-0 left-0 w-1/8 h-full flex flex-col justify-center items-center bg-gray-200">
-                <div className="absolute top-[10%] h-1/10 w-full p-4 logo">
-                    <img src={HCMUTlogo} className="h-12 mx-auto" />
-                </div>
-                <div className="flex flex-col justify-center items-center">
-                    <div className="h-2/10 w-full p-4 navItem" style={{ top: '20%' }}>
-                        <Link className="py-4" to="/Dashboard">Dashboard</Link>
-                    </div>
-                </div>
-                <div className="absolute bottom-[10%] h-10/10 w-full p-4 navItem" onClick={signOut}>
-                    <a href="#">Logout</a>
-                </div>
-            </nav>
-            <div className="body" style={{ marginLeft: '5%', width: '100%' }}>
+            <aside className="top-0 left-0 w-1/5">
+				<Sidebar />
+			</aside>
+            <div className="body w-screen h-screen" >
                 <div className="flex flex-row justify-center items-center field1">
                     <div className="flex flex-col justify-center items-center field1Item">
                         <h1 className="mx-auto">Temperature</h1>

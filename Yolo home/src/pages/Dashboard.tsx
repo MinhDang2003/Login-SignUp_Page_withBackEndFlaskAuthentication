@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
+import {Link } from "react-router-dom";
 import Users from "../component/Users";
 import Sidebar from "../component/Sidebar";
-
 function Dashboard() {
 	return (
 		<div className="flex">
