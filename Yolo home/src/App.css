@@ -27,8 +27,77 @@
   }
 }
 
+.navItem {
+    display: block;
+}
+
+.navItem:hover {
+    background-color: #555;
+    color: white;
+}
+.field1 {
+    width: 100%;
+    margin-bottom: 5px;
+    background-color: red;
+}
+.field1Item {
+    width: 30%;
+    margin: 10px;
+    padding: 5%;
+    background-color: #f1f1f1;
+}
+
+.field1Item h1 {
+    padding: 5px 10px;
+    font-size: 25px;
+}
+
+.field1Item div {
+    padding: 5px 10px;
+    font-size: 50px;
+}
+
+.field2 {
+    width: 100%;
+    margin-top: 5px;
+    background-color: blue;
+}
+.field2 button {
+    width: 20%;
+    margin: 10px;
+    padding: 5%;
+    height: 50%;
+}
+.field2 div {
+    width: 50%;
+    height: 100%;
+    margin: 10px;
+}
+.showGraph {
+    background-color: #f1f1f1;
+    min-height: 200px;
+}
+.showGraph div h1 {
+    padding: 5px 10px;
+    font-size: 25px;
+}
+.line-graph {
+    margin: 5px;
+    background-color: white;
+}
+.mode-buttons button {
+    height: 60%;
+    width: 25%;
+    margin: 5px 20px;
+    padding: 2px;
+}
+.mode-buttons h2 {
+    font-size: 16px;
+    padding: 5px 20px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+    a: nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
   }
 }
