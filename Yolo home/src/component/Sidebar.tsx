@@ -10,10 +10,11 @@ function Sidebar() {
 		navigate("/login");
 	};
 	return (
-		<div className="flex">
-			<nav className="w-full h-screen bg-[#EBE4D1] ">
+		
+		<div className="flex ">
+			<nav className="w-full h-screen bg-[#EADBC8] rounded-r-3xl shadow-md">
 				<ul className="flex flex-col w-full">
-                    <li className="w-auto">
+                    <li className="w-full">
                         <img src={HCMUTlogo} alt="HCMUT logo" className="w-1/6  mx-auto" />
                     </li>
 					<li className="w-full">

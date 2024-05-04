@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../App.css";
 import Sidebar from "../component/Sidebar";
-
+import tempicon from "../assets/temperature.png";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -192,19 +192,20 @@ function Home() {
     return (
         <div className="w-screen h-screen flex items-start">
             <aside className="top-0 left-0 w-1/5">
-				<Sidebar />
-			</aside>
-            <div className="body w-screen h-screen" >
-                <div className="flex flex-row justify-center items-center field1">
-                    <div className="flex flex-col justify-center items-center field1Item">
-                        <h1 className="mx-auto">Temperature</h1>
+                <Sidebar />
+            </aside>
+            <div className="body w-screen h-screen">
+                <h1 className="text-black font-serif text-center text-7xl">Home</h1>
+                <div className="flex flex-row h-1/3 justify-center items-center field1 bg-[#DAC0A3]">
+                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
+                        <img src={tempicon} className="h-1/2" />
                         <div>{temperature}C</div>
                     </div>
-                    <div className="flex flex-col justify-center items-center field1Item">
+                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
                         <h1 className="mx-auto">Moisture</h1>
                         <div>{moisture}%</div>
                     </div>
-                    <div className="flex flex-col justify-center items-center field1Item">
+                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
                         <h1 className="mx-auto">Light</h1>
                         <div>{light}%</div>
                     </div>
@@ -214,7 +215,7 @@ function Home() {
                         {"<"}
                     </button>
                     <div className="flex flex-col justify-center items-center showGraph">
-                        <div style={{ height: 'auto',width: '100%' }}>
+                        <div style={{ height: 'auto', width: '100%' }}>
                             <h1>{stateList[state]}</h1>
                         </div>
                         <div className="line-graph" style={{ height: '200px', width: '100%' }}>
