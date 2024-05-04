@@ -2,6 +2,8 @@ import { useState } from "react";
 import "../App.css";
 import Sidebar from "../component/Sidebar";
 import tempicon from "../assets/temperature.png";
+import humidicon from "../assets/humidity.png";
+import brighticon from "../assets/brightness.png";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -19,12 +21,12 @@ ChartJS.register(
 );
 
 function Home() {
-    const stateList = ["Temperature", "Moisture", "Light"];
+    const stateList = ["Temperature", "Humidity", "Brightness"];
     const modeList = ["Day", "Week", "Month"];
 
     const temperature = 30;
-    const moisture = 75;
-    const light = 90;
+    const humidity= 75;
+    const brightness = 90;
 
     const currentDate = new Date();
 
@@ -89,52 +91,52 @@ function Home() {
     temperatureMonth.push(temperature);
 
 
-    const moistureDay = [];
+    const humidityDay = [];
     for (let i = 0; i < 23; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        moistureDay.push(tmp);
+        humidityDay.push(tmp);
     }
-    moistureDay.push(moisture);
+    humidityDay.push(humidity);
 
-    const moistureWeek = [];
+    const humidityWeek = [];
     for (let i = 0; i < 6; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        moistureWeek.push(tmp);
+        humidityWeek.push(tmp);
     }
-    moistureWeek.push(moisture);
+    humidityWeek.push(humidity);
 
-    const moistureMonth = [];
+    const humidityMonth = [];
     for (let i = 0; i < 29; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        moistureMonth.push(tmp);
+        humidityMonth.push(tmp);
     }
-    moistureMonth.push(moisture);
+    humidityMonth.push(humidity);
 
 
-    const lightDay = [];
+    const brightnessDay = [];
     for (let i = 0; i < 23; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        lightDay.push(tmp);
+        brightnessDay.push(tmp);
     }
-    lightDay.push(light);
+    brightnessDay.push(brightness);
 
-    const lightWeek = [];
+    const brightnessWeek = [];
     for (let i = 0; i < 6; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        lightWeek.push(tmp);
+        brightnessWeek.push(tmp);
     }
-    lightWeek.push(light);
+    brightnessWeek.push(brightness);
 
-    const lightMonth = [];
+    const brightnessMonth = [];
     for (let i = 0; i < 29; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-        lightMonth.push(tmp);
+        brightnessMonth.push(tmp);
     }
-    lightMonth.push(light);
+    brightnessMonth.push(brightness);
 
     const dataList = [[temperatureDay, temperatureWeek, temperatureMonth],
-                        [moistureDay, moistureWeek, moistureMonth],
-                        [lightDay, lightWeek, lightMonth]];
+                        [humidityDay, humidityMonth, humidityWeek],
+                        [brightnessDay, brightnessWeek, brightnessMonth]];
 
     const [state, setState] = useState(0);
     const [mode, setMode] = useState(0);
@@ -196,18 +198,18 @@ function Home() {
             </aside>
             <div className="body w-screen h-screen">
                 <h1 className="text-black font-serif text-center text-7xl">Home</h1>
-                <div className="flex flex-row h-1/3 justify-center items-center field1 bg-[#DAC0A3]">
-                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
-                        <img src={tempicon} className="h-1/2" />
+                <div className="flex flex-wrap justify-center field1 bg-[#DAC0A3]">
+                    <div className="flex flex-col p-0 mx-10 justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
+                        <img src={tempicon} className="h-32 w-32" />
                         <div>{temperature}C</div>
                     </div>
-                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
-                        <h1 className="mx-auto">Moisture</h1>
-                        <div>{moisture}%</div>
+                    <div className="flex flex-col p-0 mx-10 justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
+                        <img src={humidicon} className="h-32 w-32" />
+                        <div>{humidity}%</div>
                     </div>
-                    <div className="flex flex-col h-fit justify-center aspect-square items-center field1Item rounded-3xl bg-black">
-                        <h1 className="mx-auto">Light</h1>
-                        <div>{light}%</div>
+                    <div className="flex flex-col p-0 mx-10 justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
+                        <img src={brighticon} className="h-32 w-32" />
+                        <div>{brightness}%</div>
                     </div>
                 </div>
                 <div className="flex flex-row justify-center items-center field2">
