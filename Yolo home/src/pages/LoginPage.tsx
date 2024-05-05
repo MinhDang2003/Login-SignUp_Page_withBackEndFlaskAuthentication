@@ -6,7 +6,7 @@ import {DevTool} from "@hookform/devtools"
 import {useNavigate,NavLink,useLocation} from "react-router-dom";
 import {axiosPublic} from '../api/axios';
 import axios ,{ AxiosError } from 'axios';
-import React,{useState,useEffect } from 'react';
+import React,{useState } from 'react';
 import useAuth from '../hooks/useAuth';
 // const color = {
 //    primary: "#060606",
@@ -19,7 +19,7 @@ type FormValues = {
     saved: boolean;
 }
 function Login() {
-    const {setAuth,persist,setPersist} = useAuth();
+    const {setAuth,setPersist} = useAuth();
     const form = useForm({
         defaultValues: {
             email: "",
@@ -38,11 +38,12 @@ function Login() {
         event.preventDefault()
         if(isSubmitting) return;
         try {
-            const response = await axiosPublic.post("/users/signin",{saved: data.saved,email: data.email,password: data.password} )
+            
+            const response = await axiosPublic.post("/users/signin", {saved: data.saved,email: data.email,password: data.password} )
             setAuth((prev) => {
                 return {...prev, token: response?.data?.token}
             })
-            
+            response.data
             localStorage.setItem("persist",(data.saved).toString());
             setPersist((data.saved))
             
