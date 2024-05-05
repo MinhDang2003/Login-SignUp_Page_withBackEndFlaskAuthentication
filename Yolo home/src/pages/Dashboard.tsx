@@ -3,8 +3,8 @@ import Users from "../component/Users";
 import Sidebar from "../component/Sidebar";
 function Dashboard() {
 	return (
-		<div className="flex">
-			<aside className="w-1/3">
+		<div className="w-screen h-screen  items-start">
+			<aside className="w-screen">
 				<Sidebar />
 			</aside>
 			<section className="flex-grow p-6">
