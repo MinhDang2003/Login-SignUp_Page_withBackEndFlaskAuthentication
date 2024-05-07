@@ -86,7 +86,7 @@ function SignUp() {
     
     
     return(
-        <div className= "w-screen h-screen flex items-start flex-row-reverse">
+        <div className= "w-screen h-screen flex items-start flex-row-reverse font-poppins ">
             <div className = 'relative w-2/3 h-full flex flex-col'>
                 <div className='absolute top-[10%] left-[12%] flex flex-col'>
                     <h1 className='text-6xl text-white font-bold my-4'>
@@ -99,15 +99,15 @@ function SignUp() {
                 </div>
                 <img src={COVER_IMAGE} className="w-full h-full object-cover"/>
             </div>
-            <div className='w-1/2 h-full bg-[#E0E0E0] flex flex-col pt-10 pl-[44px] p-20 justify-start'>
+            <div className='w-1/2 h-full bg-[#faf0dc] flex flex-col pt-10 pl-[44px] p-20 justify-start'>
                 <div className='w-full flex flex-row items-center '>
                     <img src={HCMUTlogo} className='h-12 mr-6'/>
                     <h1 className='text-3xl text-[#060606] font-semibold'> HCMUT-CC01-TeamDEV</h1>
                 </div>
                 <div className='w-full flex flex-col mt-12 max-w-[650px]'>
                     <div className='w-full flex flex-col mb-2'>
-                        <h3 className='text-3xl fornt-semibold mb-4'>SignUp</h3>
-                        <p className='text-base mb-2'>Please fill out all the fields below.</p>
+                        <h3 className='text-3xl fornt-semibold mb-4 text-black'>SignUp</h3>
+                        <p className='text-base mb-2 text-black'>Please fill out all the fields below.</p>
                     </div>
 
                     
