@@ -109,153 +109,118 @@ class Presenter:
             return jsonify({"msg": not (MongoAPI.checkUser(request.json["email"]))}) , 200
         return jsonify({"msg": "Email doesnt exist in request"}) , 400
 
+    @classmethod
+    def _handle_get_log(cls,choice:int,current=False):
+        #0 for temp
+        #1 for humid
+        #2 for brightness
+        
+        help_dict = {0: 'temperature',1: 'humidity',2: 'brightness'}
+        if current == True:
+            start = datetime.combine(datetime.today(), time.min)
+            end = datetime.combine(datetime.today(), time.min)
+            res= MongoAPI.getLog(limit_record=1,start_date=start,end_date=end,current=True)
+            current_log = None
+            for item in res:
+                current_log = item[help_dict[choice]]
+            if current_log is None:
+                current_log = 0
+            return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
+                
+        if not ('option' in request.json):
+            
+            return jsonify({"msg": f"Invalid get {help_dict[choice]} request - missing option field"}) , 400
+        
+        option = request.json.get('option',None)
+        if option not in [0,1,2]:
+            return jsonify({"msg": f"Invalid option value {option}"}) , 400
+        if option == 0:
+            
+            start = datetime.combine(datetime.today(), time.min) - timedelta(days=1)
+            end = datetime.combine(datetime.today(), time.min)
+            returnAr = Presenter._get_log_option(help_dict[choice],0,start,end)
+            returnAr = list(map(lambda x : {'value': mean(x['value']),'hour': x['hour'].strftime("%H:%M %d/%m")} if x['value'] != [] else {'value': 0,'hour': x['hour'].strftime("%H:%M %d/%m")},returnAr ))
+            
+            return jsonify({f"{help_dict[choice]}": returnAr}) , 200
+        elif option == 2:
+            start = datetime.combine(datetime.today(), time.min) - timedelta(days=30)
+            end = datetime.combine(datetime.today(), time.min)
+            returnAr = Presenter._get_log_option(help_dict[choice],2,start,end)
+            
+            return jsonify({f"{help_dict[choice]}": returnAr}) , 200
+        start = datetime.combine(datetime.today(), time.min) - timedelta(days=7)
+        end = datetime.combine(datetime.today(), time.min)
+        returnAr = Presenter._get_log_option(help_dict[choice],1,start,end)
+        
+        return jsonify({f"{help_dict[choice]}": returnAr}) , 200
+    
+    @classmethod
+    def _get_log_option(cls,field:str,option: int,startdate:datetime|None = None,enddate:datetime|None = None):
+        if option == 0:
+            res =  MongoAPI.getLog(2,startdate,enddate)
+            
+            arr = []
+            for i in res:
+                arr =   arr + i[field]  
+            length = len(arr)
+            if length == 0:
+                _date = enddate
+                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
+            if length == 24:
+                return arr
+            
+            returnAr = []
+            for i in range(48):
+                if arr[-(i+1)]['value'] == [] and arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
+                    continue
+                returnAr = arr[:-(i)]
+                break
+            if len(returnAr) >= 24:
+                return returnAr[-24:]
+            if len(returnAr) == 0:
+                _date = enddate
+                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
+            else: return returnAr + [{'value': [], 'hour': returnAr[-1]['hour'] + timedelta(hours=hour)} for hour in range(1,25-len(returnAr))] 
+        if option == 1:
+            limit = 7
+        else: limit = 30
+            
+        res =  MongoAPI.getLog(limit,startdate,enddate)
+        arr = []
+        _date = startdate
+        for i in res:
+            while i['date'] != _date:    
+                arr = arr + [{'value': 0 ,'date': _date.strftime("%d/%m")}]
+                _date = _date + timedelta(days = 1)
+            
+            value = Presenter.processLst(i[field])
+            arr = arr + [{'value': value ,'date': _date.strftime("%d/%m")}]
+            _date = _date + timedelta(days = 1)
+        return arr
     
     @classmethod
     def handle_get_temp(cls):
-        
-        if not ('option' in request.json):
-            
-            return jsonify({"msg": "Invalid get temp request - missing option field"}) , 400
-        
-        option = request.json.get('option',None)
-        if option not in [0,1,2]:
-            return jsonify({"msg": f"Invalid option value {option}"}) , 400
-        
-        if option == 0:
-            
-            start = datetime.combine(datetime.today(), time.min) - timedelta(days=1)
-            end = datetime.combine(datetime.today(), time.min)
-            returnAr = Presenter.get_temp_option(0,start,end)
-            returnAr = list(map(lambda x : {'value': mean(x['value']),'hour': x['hour'].strftime("%H:%M %d/%m")} if x['value'] != [] else {'value': 0,'hour': x['hour'].strftime("%H:%M %d/%m")},returnAr ))
-            
-            return jsonify({"temp": returnAr}) , 200
-        elif option == 2:
-            start = datetime.combine(datetime.today(), time.min) - timedelta(days=30)
-            end = datetime.combine(datetime.today(), time.min)
-            returnAr = Presenter.get_temp_option(2,start,end)
-            
-            return jsonify({"temp": returnAr}) , 200
-        start = datetime.combine(datetime.today(), time.min) - timedelta(days=7)
-        end = datetime.combine(datetime.today(), time.min)
-        returnAr = Presenter.get_temp_option(1,start,end)
-        
-        return jsonify({"temp": returnAr}) , 200
-        
-        
-        
-    @classmethod
-    def get_temp_option(cls,option: int,startdate:datetime|None = None,enddate:datetime|None = None):
-        if option == 0:
-            res =  MongoAPI.getTempHumid(2,startdate,enddate)
-            
-            arr = []
-            for i in res:
-                arr =   arr + i['temperature']  
-            length = len(arr)
-            if length == 0:
-                _date = enddate
-                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
-            if length == 24:
-                return arr
-            
-            returnAr = []
-            for i in range(48):
-                if arr[-(i+1)]['value'] == [] and arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
-                    continue
-                returnAr = arr[:-(i)]
-                break
-            if len(returnAr) >= 24:
-                return returnAr[-24:]
-            if len(returnAr) == 0:
-                _date = enddate
-                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
-            else: return returnAr + [{'value': [], 'hour': returnAr[-1]['hour'] + timedelta(hours=hour)} for hour in range(1,25-len(returnAr))] 
-        if option == 1:
-            limit = 7
-        else: limit = 30
-            
-        res =  MongoAPI.getTempHumid(limit,startdate,enddate)
-        arr = []
-        _date = startdate
-        for i in res:
-            while i['date'] != _date:    
-                arr = arr + [{'value': 0 ,'date': _date.strftime("%d/%m")}]
-                _date = _date + timedelta(days = 1)
-                
-            value = Presenter.processLst(i['temperature'])
-            arr = arr + [{'value': value ,'date': _date.strftime("%d/%m")}]
-            _date = _date + timedelta(days = 1)
-        return arr
-    
-    @classmethod
-    def get_humid_option(cls,option: int,startdate:datetime|None = None,enddate:datetime|None = None):
-        if option == 0:
-            res =  MongoAPI.getTempHumid(2,startdate,enddate)
-            
-            arr = []
-            for i in res:
-                arr =   arr + i['humidity']  
-            length = len(arr)
-            if length == 0:
-                _date = enddate
-                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
-            if length == 24:
-                return arr
-            
-            returnAr = []
-            for i in range(48):
-                if arr[-(i+1)]['value'] == [] and arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
-                    continue
-                returnAr = arr[:-(i)]
-                break
-            if len(returnAr) >= 24:
-                return returnAr[-24:]
-            if len(returnAr) == 0:
-                _date = enddate
-                return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
-            else: return returnAr + [{'value': [], 'hour': returnAr[-1]['hour'] + timedelta(hours=hour)} for hour in range(1,25-len(returnAr))] 
-        if option == 1:
-            limit = 7
-        else: limit = 30
-            
-        res =  MongoAPI.getTempHumid(limit,startdate,enddate)
-        arr = []
-        _date = startdate
-        for i in res:
-            while i['date'] != _date:    
-                arr = arr + [{'value': 0 ,'date': _date.strftime("%d/%m")}]
-                _date = _date + timedelta(days = 1)
-                
-            value = Presenter.processLst(i['humidity'])
-            arr = arr + [{'value': value ,'date': _date.strftime("%d/%m")}]
-            _date = _date + timedelta(days = 1)
-        return arr
-    
+        return Presenter._handle_get_log(0)
     
     @classmethod
     def handle_get_humid(cls):
-        if 'option' not in request.json:
-            return jsonify({"msg": "Invalid get humid request - missing option field"}) , 400
-        option = request.json.get('option',None)
-        if option not in [0,1,2]:
-            return jsonify({"msg": f"Invalid option value {option}"}) , 400
-        option = request.json.get("option",None)
-        
-        if option == 0:
-            start = datetime.combine(datetime.today(), time.min) - timedelta(days=1)
-            end = datetime.combine(datetime.today(), time.min)
-            returnAr = Presenter.get_humid_option(0,start,end)
-            returnAr = list(map(lambda x : {'value': mean(x['value']),'hour': x['hour'].strftime("%H:%M %d/%m")} if x['value'] != [] else {'value': 0,'hour': x['hour'].strftime("%H:%M %d/%m")},returnAr ))
-            return returnAr
-        elif option == 2:
-            start = datetime.combine(datetime.today(), time.min) - timedelta(days=30)
-            end = datetime.combine(datetime.today(), time.min)
-            returnAr = Presenter.get_humid_option(2,start,end)
-            return returnAr
-        start = datetime.combine(datetime.today(), time.min) - timedelta(days=7)
-        end = datetime.combine(datetime.today(), time.min)
-        returnAr = Presenter.get_humid_option(1,start,end)
-        return returnAr
+        return Presenter._handle_get_log(1)
+    
+    @classmethod
+    def handle_get_brightness(cls):
+        return Presenter._handle_get_log(2)
+    
+    @classmethod
+    def handle_get_current_temp(cls):
+        return Presenter._handle_get_log(0,True)
+    
+    @classmethod
+    def handle_get_current_humid(cls):
+        return Presenter._handle_get_log(1,True)
+    
+    @classmethod
+    def handle_get_current_brightness(cls):
+        return Presenter._handle_get_log(2,True)
     
     @classmethod
     def handle_add_temp(cls,val: float):
@@ -280,9 +245,74 @@ class Presenter:
             if result is None:
                 return False
             return True 
+    @classmethod
+    def createNewRoom(cls):
+        if 'room_id' not in request.json:
+            return jsonify({"msg": "Invalid create new room request - missing room_id field"}) , 400
+        room_id = request.json.get('room_id',None)
+        result = MongoAPI.createNewRoom(room_id)
+        if result:
+            return jsonify({"msg": f"Successful added room: {room_id}"}) , 200
+        else :
+            return jsonify({"msg": f"room_id: {room_id} already exist"}) , 400
+        
+    @classmethod
+    def deleteRoom(cls):
+        if 'room_id' not in request.json:
+            return jsonify({"msg": "Invalid delte room request - missing room_id field"}) , 400
+        room_id = request.json.get('room_id',None)
+        result = MongoAPI.deleteRoom(room_id)
+        if not (result is None):
+            return jsonify({"msg": f"Successful deleted room: {room_id}"}) , 200
+        else :
+            return jsonify({"msg": f"room_id: {room_id} doesnt exist"}) , 400
     
     @classmethod
+    def addAppliances(cls):
+        for item in ['room_id','appliance_id','appliance_type']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid add appliances request - missing {item} field"}) , 400
+        room_id = request.json.get("room_id",None)
+        app_id = request.json.get("appliance_id",None)
+        app_type = request.json.get("appliance_type",None)
+        result = MongoAPI.addAppliance(room_id=room_id,app_id=app_id,app_type=app_type)
+        if type(result) is str:
+            return jsonify({"msg": result}) , 400
+        if result is None:
+            return jsonify({"msg": f"Failed to add {app_id} to room_id: {room_id}"}) , 400
+        return jsonify({"msg": f"Successful added {app_id} to room_id: {room_id}"}) , 200 
+    
+    @classmethod
+    def deleteAppliances(cls):
+        for item in ['room_id','appliance_id']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid delete appliances request - missing {item} field"}) , 400
+        room_id = request.json.get("room_id",None)
+        app_id = request.json.get("appliance_id",None)
+        result = MongoAPI.deleteAppliance(room_id=room_id,app_id=app_id)
+        if type(result) is str:
+            return jsonify({"msg": result}) , 400
+        if not (result is None):
+            return jsonify({"msg": f"Successful deleted appliance: {app_id} from room: {room_id}"}) , 200
+        else :
+            return jsonify({"msg": f"Failed to delete appliance: {app_id} from room: {room_id}"}) , 400
+    
+    @classmethod
+    def _updateAppliances(cls,app_type:str,val):
+        # for item in ['room_id','appliance_id']:
+        #     if item not in request.json:
+        #         return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
+        room_id = request.json.get("room_id",None)
+        app_id = request.json.get("appliance_id",None)
+        result = MongoAPI.updateAppliance(room_id=room_id,app_id=app_id,app_type=app_type,val=val)
+        return result
+        
+        
+    @classmethod
     def handle_update_fan(cls):
+        for item in ['room_id','appliance_id']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
         if 'level' not in request.json:
             return jsonify({"msg": "Invalid update fan request - missing level field"}) , 400
         level = request.json.get('level',None)
@@ -294,25 +324,32 @@ class Presenter:
         except Exception as e:
             print(f"Error: {e}")
         else: 
-            result = MongoAPI.updateFan(level)
+            result = Presenter._updateAppliances('fan',level)
+            if type(result) is str:
+                return jsonify({"msg": result}) , 400
             if result is None:
                 return jsonify({"msg": "Failed to update fan"}) , 400
             return jsonify({"msg": "Successful"}) , 200 
     
     @classmethod
     def handle_update_light(cls):
+        for item in ['room_id','appliance_id']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
         if 'color' not in request.json:
             return jsonify({"msg": "Invalid update request light - missing color field"}) , 400
         color = request.json.get('color',None)
         if color not in ['#000000','#111111','#c4e024']:
-            return jsonify({"msg": "Invalid color"}) , 400
+            return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#111111','#c4e024']}"}) , 400
         try:
             #AdaAPI().publishData(color,'light')
             print("update light")
         except Exception as e:
             print(f"Error: {e}")
         else: 
-            result = MongoAPI.updateLight(color)
+            result = Presenter._updateAppliances('light',color)
+            if type(result) is str:
+                return jsonify({"msg": result}) , 400
             if result is None:
                 return jsonify({"msg": "Failed to update light"}) , 400
             return jsonify({"msg": "Successful"}) , 200 
