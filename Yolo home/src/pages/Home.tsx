@@ -25,10 +25,16 @@ function Home() {
     
     const logout = useLogout();
 
+<<<<<<< Updated upstream
     const signOut = async () => {
         await logout();
         navigate('/login');
     }
+=======
+	// const temperature = 30;
+	// const humidity = 75;
+	// const brightness = 90;
+>>>>>>> Stashed changes
 
     const stateList = ["Temperature", "Moisture", "Light"];
     const modeList = ["Day", "Week", "Month"];
@@ -65,6 +71,7 @@ function Home() {
         daysInEachMonth.push(days);
     }
 
+<<<<<<< Updated upstream
     for (let date = 0; date <= 30; date += 3) {
         const count = currentDay - 30 + date;
         if (count <= 0) {
@@ -74,6 +81,15 @@ function Home() {
             monthLabel.push(count.toString() + " " + months[currentMonth]);
         }
     }
+=======
+	/*
+	const temperatureDay = [];
+	for (let i = 0; i < 23; i++) {
+		const tmp = Math.floor(Math.random() * (40 - 27 + 1)) + 27;
+		temperatureDay.push(tmp);
+	}
+	temperatureDay.push(temperature);
+>>>>>>> Stashed changes
 
     const labelList = [dayLabel, weekLabel, monthLabel];
 
@@ -107,12 +123,39 @@ function Home() {
     }
     moistureDay.push(moisture);
 
+<<<<<<< Updated upstream
     const moistureWeek = [];
     for (let i = 0; i < 6; i++) {
         const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
         moistureWeek.push(tmp);
     }
     moistureWeek.push(moisture);
+=======
+	const brightnessMonth = [];
+	for (let i = 0; i < 29; i++) {
+		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
+		brightnessMonth.push(tmp);
+	}
+	brightnessMonth.push(brightness);
+	*/
+
+	const temperatureDay = handle_get_temp(0)["value"];
+	const humidityDay = handle_get_humid(0)["value"];
+	const brightnessDay = handle_get_brightness(0)["value"];
+
+	const temperatureWeek = handle_get_temp(1)["value"];
+	const humidityWeek = handle_get_humid(1)["value"];
+	const brightnessWeek = handle_get_brightness(1)["value"];
+
+	const temperatureMonth = handle_get_temp(2)["value"];
+	const humidityMonth = handle_get_humid(2)["value"];
+	const brightnessMonth = handle_get_brightness(2)["value"];
+
+	const temperature = temperatureDay[temperatureDay.length - 1];
+	const humidity = humidityDay[humidityDay.length - 1];
+	const brightness = brightnessDay[brightnessDay.length - 1];
+
+>>>>>>> Stashed changes
 
     const moistureMonth = [];
     for (let i = 0; i < 29; i++) {
