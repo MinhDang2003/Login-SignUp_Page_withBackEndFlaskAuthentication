@@ -4,6 +4,8 @@ import Sidebar from "../component/Sidebar";
 import tempicon from "../assets/temperature.png";
 import humidicon from "../assets/humidity.png";
 import brighticon from "../assets/brightness.png";
+import { axiosPublic } from "../api/axios";
+
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -18,10 +20,6 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 function Home() {
 	const stateList = ["Temperature", "Humidity", "Brightness"];
 	const modeList = ["Day", "Week", "Month"];
-
-	const temperature = 30;
-	const humidity = 75;
-	const brightness = 90;
 
 	const currentDate = new Date();
 
@@ -49,12 +47,48 @@ function Home() {
 
 	const monthLabel = [];
 	const weekLabel = [];
-	const dayLabel = [];
+	const dayLabel : string[]=[];
 
-	for (let i = 1; i <= 24; i++) {
-		dayLabel.push((currentHour + i) % 24);
-	}
-	for (let i = 1; i <= 7; i++) {
+	const fetchTemperature = async (opt: number) => {
+		const response = await axiosPublic.post("/api/temperature", {
+			option: opt,
+		});
+		return response.data;
+	};
+	
+	const fetchHumidity = async (opt: number) => {
+		const response = await axiosPublic.post("/api/humidity", { option: opt });
+		return response.data;
+	};
+
+	const fetchBrightness = async (opt: number) => {
+		const response = await axiosPublic.post("/api/temperature", {
+			option: opt,
+		})
+		return response;
+	};
+
+	var temperatureDay
+	fetchTemperature(0).then((data) => {
+		temperatureDay=data;
+		for (let i=0; i < 24; i++) {
+			dayLabel.push(temperatureDay.temp[i].hour);
+        }
+		console.log(dayLabel);
+	});
+	
+	
+	
+	const temperatureWeek = fetchTemperature(1);
+	const temperatureMonth = fetchTemperature(2);
+	const humidityDay = fetchHumidity(0);
+	const humidityWeek = fetchHumidity(1);
+	const humidityMonth = fetchHumidity(2);
+	const brightnessDay = fetchBrightness(0);
+	const brightnessWeek = fetchBrightness(1);
+	const brightnessMonth = fetchBrightness(2);
+
+	for (let i = 0; i < 7; i++) {
 		weekLabel.push(weeks[(currentDayOfWeek + i) % 7]);
 	}
 	const daysInEachMonth = [];
@@ -79,69 +113,9 @@ function Home() {
 
 	const labelList = [dayLabel, weekLabel, monthLabel];
 
-	const temperatureDay = [];
-	for (let i = 0; i < 23; i++) {
-		const tmp = Math.floor(Math.random() * (40 - 27 + 1)) + 27;
-		temperatureDay.push(tmp);
-	}
-	temperatureDay.push(temperature);
-
-	const temperatureWeek = [];
-	for (let i = 0; i < 6; i++) {
-		const tmp = Math.floor(Math.random() * (40 - 27 + 1)) + 27;
-		temperatureWeek.push(tmp);
-	}
-	temperatureWeek.push(temperature);
-
-	const temperatureMonth = [];
-	for (let i = 0; i < 29; i++) {
-		const tmp = Math.floor(Math.random() * (40 - 27 + 1)) + 27;
-		temperatureMonth.push(tmp);
-	}
-	temperatureMonth.push(temperature);
-
-	const humidityDay = [];
-	for (let i = 0; i < 23; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		humidityDay.push(tmp);
-	}
-	humidityDay.push(humidity);
-
-	const humidityWeek = [];
-	for (let i = 0; i < 6; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		humidityWeek.push(tmp);
-	}
-	humidityWeek.push(humidity);
-
-	const humidityMonth = [];
-	for (let i = 0; i < 29; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		humidityMonth.push(tmp);
-	}
-	humidityMonth.push(humidity);
-
-	const brightnessDay = [];
-	for (let i = 0; i < 23; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		brightnessDay.push(tmp);
-	}
-	brightnessDay.push(brightness);
-
-	const brightnessWeek = [];
-	for (let i = 0; i < 6; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		brightnessWeek.push(tmp);
-	}
-	brightnessWeek.push(brightness);
-
-	const brightnessMonth = [];
-	for (let i = 0; i < 29; i++) {
-		const tmp = Math.floor(Math.random() * (100 - 0 + 1)) + 0;
-		brightnessMonth.push(tmp);
-	}
-	brightnessMonth.push(brightness);
-
+	const temperature = 35;
+	const humidity = 35;
+	const brightness = 35;
 	const dataList = [
 		[temperatureDay, temperatureWeek, temperatureMonth],
 		[humidityDay, humidityMonth, humidityWeek],
@@ -179,7 +153,7 @@ function Home() {
 
 	const toggleMode = (num: number) => {
 		setMode(() => {
-			const newMode =num;
+			const newMode = num;
 			updateDataAndLabels(state, newMode);
 			return newMode;
 		});
@@ -203,7 +177,7 @@ function Home() {
 	return (
 		<div className="w-screen h-screen  items-start">
 			<div className="h-12">
-				<Sidebar/>
+				<Sidebar />
 			</div>
 			<div className="body w-screen h-screen ">
 				<h1 className="text-black font-serif text-center text-7xl">Home</h1>
@@ -222,7 +196,7 @@ function Home() {
 					</div>
 				</div>
 				<div className="mt-5  items-center bg-[#DAC0A3] shadow-xl ">
-					<div >
+					<div>
 						<h1 className=" text-black"> History Log</h1>
 
 						<button className="m-5 w-40" onClick={() => toggleState(0)}>
@@ -235,7 +209,7 @@ function Home() {
 							{"Brightness"}
 						</button>
 					</div>
-					<div >
+					<div>
 						<button className="m-5 w-40" onClick={() => toggleMode(0)}>
 							{"Day"}
 						</button>
