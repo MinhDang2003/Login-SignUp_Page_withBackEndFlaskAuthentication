@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../App.css";
 import Sidebar from "../component/Sidebar";
 import tempicon from "../assets/temperature.png";
@@ -12,6 +12,7 @@ import {
 	LineElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import axiosPublic from "axios";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -19,9 +20,11 @@ function Home() {
 	const stateList = ["Temperature", "Humidity", "Brightness"];
 	const modeList = ["Day", "Week", "Month"];
 
+	/*
 	const temperature = 30;
 	const humidity = 75;
 	const brightness = 90;
+	*/
 
 	const currentDate = new Date();
 
@@ -78,7 +81,7 @@ function Home() {
 	}
 
 	const labelList = [dayLabel, weekLabel, monthLabel];
-
+	/*
 	const temperatureDay = [];
 	for (let i = 0; i < 23; i++) {
 		const tmp = Math.floor(Math.random() * (40 - 27 + 1)) + 27;
@@ -141,6 +144,72 @@ function Home() {
 		brightnessMonth.push(tmp);
 	}
 	brightnessMonth.push(brightness);
+	*/
+
+	/*
+	const temperatureDay = handle_get_temp(0)["value"];
+	const humidityDay = handle_get_humid(0)["value"];
+	const brightnessDay = handle_get_brightness(0)["value"];
+
+	const temperatureWeek = handle_get_temp(1)["value"];
+	const humidityWeek = handle_get_humid(1)["value"];
+	const brightnessWeek = handle_get_brightness(1)["value"];
+
+	const temperatureMonth = handle_get_temp(2)["value"];
+	const humidityMonth = handle_get_humid(2)["value"];
+	const brightnessMonth = handle_get_brightness(2)["value"];
+	*/
+
+	const [temperatureDay, setTemperatureDay] = useState([]);
+	const [humidityDay, setHumidityDay] = useState([]);
+	const [brightnessDay, setBrightnessDay] = useState([]);
+
+	const [temperatureWeek, setTemperatureWeek] = useState([]);
+	const [humidityWeek, setHumidityWeek] = useState([]);
+	const [brightnessWeek, setBrightnessWeek] = useState([]);
+
+	const [temperatureMonth, setTemperatureMonth] = useState([]);
+	const [humidityMonth, setHumidityMonth] = useState([]);
+	const [brightnessMonth, setBrightnessMonth] = useState([]);
+
+	useEffect(() => {
+		fetchData(0); // Fetch initial data for day mode
+		fetchData(1);
+		fetchData(2);
+	}, []);
+
+	const fetchData = async (option: number) => {
+		try {
+			const responseTemp = await axiosPublic.post("/api/temperature", { option });
+			const dataTemp = responseTemp.data;
+
+			const responseHumid = await axiosPublic.post("/api/humidity", { option });
+			const dataHumid = responseHumid.data;
+
+			const responseBrightness = await axiosPublic.post("/api/brightness", { option });
+			const dataBrightness = responseBrightness.data;
+
+			if (option === 0) {
+				setTemperatureDay(dataTemp.value);
+				setHumidityDay(dataHumid.value);
+				setBrightnessDay(dataBrightness.value);
+			} else if (option === 1) {
+				setTemperatureWeek(dataTemp.value);
+				setHumidityWeek(dataHumid.value);
+				setBrightnessWeek(dataBrightness.value);
+			} else if (option === 2) {
+				setTemperatureMonth(dataTemp.value);
+				setHumidityMonth(dataHumid.value);
+				setBrightnessMonth(dataBrightness.value);
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const temperature = temperatureDay[temperatureDay.length - 1];
+	const humidity = humidityDay[humidityDay.length - 1];
+	const brightness = brightnessDay[brightnessDay.length - 1];
 
 	const dataList = [
 		[temperatureDay, temperatureWeek, temperatureMonth],
