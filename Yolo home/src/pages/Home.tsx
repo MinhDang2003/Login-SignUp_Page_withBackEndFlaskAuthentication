@@ -44,7 +44,7 @@ function Home() {
 
 	const getCurrentStat = async ()=> {
 		try {
-            const responseTemp = await axiosPublic.post("/api/current_temperature",{});
+            const responseTemp = await axiosPublic.post("/api/current_temperature");
             const dataTemp = responseTemp.data;
             setCurrentTemperature(dataTemp);
             const responseHumid = await axiosPublic.post("/api/current_humidity",{});
@@ -57,9 +57,10 @@ function Home() {
 		console.log(error);
 	}
 	};
-	getCurrentStat();
+	
 
 	useEffect(() => {
+		getCurrentStat();
 		fetchData(0); // Fetch initial data for day mode
 		fetchData(1);
 		fetchData(2);
