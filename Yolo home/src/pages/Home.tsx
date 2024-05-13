@@ -60,7 +60,7 @@ function Home() {
 	
 
 	useEffect(() => {
-		getCurrentStat();
+		setInterval(getCurrentStat,5000);
 		fetchData(0); // Fetch initial data for day mode
 		fetchData(1);
 		fetchData(2);
