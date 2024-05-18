@@ -125,7 +125,10 @@ class Presenter:
                 current_log = item[help_dict[choice]]
             if current_log is None:
                 current_log = 0
-            return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
+                #return jsonify({f"{help_dict[choice]}": current_log}) , 200
+                return jsonify({f"value": current_log}) , 200
+            #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
+            return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
                 
         if not ('option' in request.json):
             
@@ -353,4 +356,24 @@ class Presenter:
             if result is None:
                 return jsonify({"msg": "Failed to update light"}) , 400
             return jsonify({"msg": "Successful"}) , 200 
+    
+    @classmethod
+    def getAllRoom(cls):
+        records = MongoAPI.getAllRoom()
+        room = {'rooms': []}
         
+        for record in records:
+            
+            room['rooms'].append(dict(record))
+        return jsonify(({"msg": "Successful", "rooms": room["rooms"]})) , 200
+    
+    @classmethod
+    def getRoom(cls):
+        if 'room_id' not in request.json:
+            return jsonify({"msg": "Invalid get room request - missing room_id field"}) , 400
+        room_id = request.json.get('room_id',None)
+        result = MongoAPI.getRoom(room_id)
+        if not (result is None):
+            return jsonify(({"msg": f"Successful get room: {room_id}",'rooms': dict(result)})) , 200
+        else :
+            return jsonify({"msg": f"room_id: {room_id} doesnt exist"}) , 400

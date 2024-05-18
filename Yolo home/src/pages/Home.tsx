@@ -45,13 +45,13 @@ function Home() {
 	const getCurrentStat = async ()=> {
 		try {
             const responseTemp = await axiosPublic.post("/api/current_temperature");
-            const dataTemp = responseTemp.data;
+            const dataTemp = responseTemp.data.value;
             setCurrentTemperature(dataTemp);
             const responseHumid = await axiosPublic.post("/api/current_humidity");
-            const dataHumid = responseHumid.data;
+            const dataHumid = responseHumid.data.value;
             setCurrentHumidity(dataHumid);
             const responseBrightness = await axiosPublic.post("/api/current_brightness");
-            const dataBrightness = responseBrightness.data;
+            const dataBrightness = responseBrightness.data.value;
 			setCurrentBrightness(dataBrightness);
 	}catch (error) {
 		console.log(error);

@@ -86,6 +86,18 @@ class MongoAPI():
         return False
     
     @classmethod
+    def getRoom(cls,room_id:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        },{"_id": 0})
+        return found
+    
+    @classmethod
+    def getAllRoom(cls):
+        return rooms.find({},{"_id": 0})
+    
+    
+    @classmethod
     def deleteRoom(cls,room_id:str):
         found = rooms.find_one_and_delete({"room_id": room_id})
         return found
@@ -241,12 +253,14 @@ class MongoAPI():
         
         return res
 
-
-# for i in range(35,36):
+# start = 20
+# end = 45
+# for i in range(0,100):
 #     for j in range(0,24):
-#         MongoAPI.addLog(0,30,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
-#         MongoAPI.addLog(1,35,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
-#         MongoAPI.addLog(2,20,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
+#         for z in range(0,5):
+#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
    
 
 
