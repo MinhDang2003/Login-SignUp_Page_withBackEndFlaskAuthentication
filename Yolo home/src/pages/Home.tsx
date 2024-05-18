@@ -47,10 +47,10 @@ function Home() {
             const responseTemp = await axiosPublic.post("/api/current_temperature");
             const dataTemp = responseTemp.data;
             setCurrentTemperature(dataTemp);
-            const responseHumid = await axiosPublic.post("/api/current_humidity",{});
+            const responseHumid = await axiosPublic.post("/api/current_humidity");
             const dataHumid = responseHumid.data;
             setCurrentHumidity(dataHumid);
-            const responseBrightness = await axiosPublic.post("/api/current_brightness",{});
+            const responseBrightness = await axiosPublic.post("/api/current_brightness");
             const dataBrightness = responseBrightness.data;
 			setCurrentBrightness(dataBrightness);
 	}catch (error) {
