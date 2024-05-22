@@ -14,6 +14,7 @@ import {
 	LineElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import Sidebarr from "../component/Sidebar";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -45,13 +46,13 @@ function Home() {
 	const getCurrentStat = async ()=> {
 		try {
             const responseTemp = await axiosPublic.post("/api/current_temperature");
-            const dataTemp = responseTemp.data.value;
+            const dataTemp = Math.round(responseTemp.data.value);
             setCurrentTemperature(dataTemp);
             const responseHumid = await axiosPublic.post("/api/current_humidity");
-            const dataHumid = responseHumid.data.value;
+            const dataHumid = Math.round(responseHumid.data.value);
             setCurrentHumidity(dataHumid);
             const responseBrightness = await axiosPublic.post("/api/current_brightness");
-            const dataBrightness = responseBrightness.data.value;
+            const dataBrightness = Math.round(responseBrightness.data.value);
 			setCurrentBrightness(dataBrightness);
 	}catch (error) {
 		console.log(error);
@@ -224,11 +225,11 @@ function Home() {
 	};
 
 	return (
-		<div className="w-screen h-screen  items-start">
-			<div className="h-12">
-				<Sidebar />
+		<div className=" flex h-screen w-screen min-h-screen items-start overflow-y-auto">
+			<div className="sticky h-screen left-0 top-0" >
+				<Sidebarr />
 			</div>
-			<div className="body w-screen h-screen ">
+			<div className=" grow body w-screen h-screen ">
 				<h1 className="text-black font-serif text-center text-7xl">Home</h1>
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">

@@ -1,41 +1,117 @@
-import { useNavigate, Link } from "react-router-dom";
-import useLogout from "../hooks/useLogout";
-import HCMUTlogo from "../assets/OIP.png";
-import { render } from "react-dom";
+import { useState } from "react";
+import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { tokens } from "../theme.tsx";
 
-function Sidebar() {
-	const logout = useLogout();
-	const navigate = useNavigate();
-	const signOut = async () => {
-		await logout();
-		navigate("/login");
-	};
-	return (
-		<div className="h-10">
-			<nav className="bg-[#FEFAF6] h-10">
-				<ul className=" flex items-center">
-                    <li >
-                        <img className="h-8 items-center" src={HCMUTlogo} alt="HCMUT logo" />
-                    </li>
-					<li  >
-						<Link to="/Dashboard" className="block p-3  ">
-							Dashboard
-						</Link>
-					</li>
-					<li >
-						<Link to="/" className="block p-3 ">
-							Home
-						</Link>
-					</li>
-					<div >
-						<Link to="#" className="block p-3 hover:bg-transparent hover:text-[#26577C]  navItem" onClick={signOut}>
-							Log Out
-						</Link>
-					</div>
-				</ul>
-			</nav>
-		</div>
-	);
-}
+import "react-pro-sidebar/dist/css/styles.css";
 
-export default Sidebar;
+import { Link } from "react-router-dom";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
+import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
+
+const Item = ({ title, to, icon, selected, setSelected }: { title: string; to: string; icon: JSX.Element; selected: string; setSelected: React.Dispatch<React.SetStateAction<string>> })=> {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    return (
+      <MenuItem 
+        active={selected === title}
+        style={{
+          color: colors.grey[100],
+        }}
+        onClick={() => setSelected(title)}
+        icon={icon}
+      >
+        <Typography>{title}</Typography>
+        <Link to={to} />
+      </MenuItem>
+    );
+  };
+  
+  const Sidebarr = () => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [selected, setSelected] = useState("Home");
+    return (
+      
+      <Box 
+        sx={{
+          height: "100%",
+          "& .pro-sidebar-inner": {
+            backgroundColor: "#FEFAF6!important",
+          },
+          "& .pro-icon-wrapper": {
+            backgroundColor: "transparent !important",
+          },
+          "& .pro-inner-item": {
+            padding: "5px 35px 5px 20px !important",
+          },
+          "& .pro-inner-item:hover": {
+            color: "#153448 !important",
+          },
+        }}
+      >
+        <ProSidebar collapsed={isCollapsed}>
+          <Menu iconShape="square">
+            {/* LOGO AND MENU ICON */}
+            <MenuItem
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+              style={{
+                margin: "10px 0 20px 0",
+                color: colors.grey[100],
+              }}
+            >
+              {!isCollapsed && (
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  ml="15px"
+                >
+                  <Typography fontFamily={"Inter"} fontSize={30} color={colors.grey[100]}>
+                    YoloHome
+                  </Typography>
+                  <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                    <MenuOutlinedIcon />
+                  </IconButton>
+                </Box>
+              )}
+            </MenuItem>
+  
+  
+            <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+              <Item
+                title="Home"
+                to="/"
+                icon={<HomeOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+  
+  
+              <Item
+                title="Dashboard"
+                to="/Dashboard"
+                icon={<BarChartOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="FAQ Page"
+                to="/faq"
+                icon={<HelpOutlineOutlinedIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+  
+            </Box>
+          </Menu>
+        </ProSidebar>
+      </Box>
+    );
+  };
+  
+  export default Sidebarr;
