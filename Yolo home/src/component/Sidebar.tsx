@@ -27,6 +27,11 @@ function Sidebar() {
 							Home
 						</Link>
 					</li>
+					<li >
+						<Link to="/FaceRegFront" className="block p-3 ">
+							Face Recognizer
+						</Link>
+					</li>
 					<div >
 						<Link to="#" className="block p-3 hover:bg-transparent hover:text-[#26577C]  navItem" onClick={signOut}>
 							Log Out
