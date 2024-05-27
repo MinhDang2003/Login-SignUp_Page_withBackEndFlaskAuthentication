@@ -64,6 +64,38 @@ def temperature():
 def humidity():
     return Presenter.handle_get_humid()
 
+@app.route("/api/brightness",methods=['POST'])
+def brightness():
+    return Presenter.handle_get_brightness()
+
+@app.route("/api/current_temperature",methods=['POST'])
+def current_temperature():
+    return Presenter.handle_get_current_temp()
+
+@app.route("/api/current_humidity",methods=['POST'])
+def current_humidity():
+    return Presenter.handle_get_current_humid()
+
+@app.route("/api/current_brightness",methods=['POST'])
+def current_brightness():
+    return Presenter.handle_get_current_brightness()
+#######################################
+@app.route("/api/new_app",methods=['POST'])
+def new_appliance():
+    return Presenter.addAppliances()
+
+@app.route("/api/del_app",methods=['POST'])
+def delete_appliance():
+    return Presenter.deleteAppliances()
+
+@app.route("/api/new_room",methods=['POST'])
+def new_room():
+    return Presenter.createNewRoom()
+
+@app.route("/api/del_room",methods=['POST'])
+def delete_room():
+    return Presenter.deleteRoom()
+
 @app.route("/api/fan",methods=['POST'])
 def fan():
     return Presenter.handle_update_fan()
@@ -71,6 +103,15 @@ def fan():
 @app.route("/api/light",methods=['POST'])
 def light():
     return Presenter.handle_update_light()
+
+@app.route("/api/getAllRoom",methods=['GET'])
+def getAllRoom():
+    return Presenter.getAllRoom()
+
+@app.route("/api/getRoom",methods=['POST'])
+def getRoom():
+    return Presenter.getRoom()
+
 
 if __name__ == "__main__":
     app.run(debug=True,port=8090)

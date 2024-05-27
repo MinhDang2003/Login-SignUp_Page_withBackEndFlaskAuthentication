@@ -17,9 +17,10 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.get_database('SmartHome')
 records = db.Log
 users = db.Users
+rooms = db.Rooms
 users.create_index([("email", 1)],unique=True,sparse=True)
 records.create_index([("date", 1)],unique=True,sparse=True)
-
+rooms.create_index([('room_id',1),('appliances.app_id',1),('appliances.app_type',1)],unique=True,sparse=True)
 class MongoAPI():
     #Authentication
     
@@ -69,7 +70,76 @@ class MongoAPI():
     def getUserRecord(cls,refresh_token:str) -> dict:
         found = users.find_one({"refresh_token": refresh_token})
         return found
-        
+    
+    @classmethod
+    def createNewRoom(cls,room_id:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        })
+        if found is None:
+            post = {
+                "room_id": room_id,
+                "appliances": []
+            }
+            found = rooms.insert_one(post)
+            return True
+        return False
+    
+    @classmethod
+    def getRoom(cls,room_id:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        },{"_id": 0})
+        return found
+    
+    @classmethod
+    def getAllRoom(cls):
+        return rooms.find({},{"_id": 0})
+    
+    
+    @classmethod
+    def deleteRoom(cls,room_id:str):
+        found = rooms.find_one_and_delete({"room_id": room_id})
+        return found
+    
+    @classmethod
+    def addAppliance(cls,room_id:str,app_id:str,app_type:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        })
+        if found is None:
+            post = {
+                "room_id": room_id
+            }
+            return f"room_id: {room_id} doesnt exist"
+        found = rooms.find_one({
+            "room_id": room_id,
+            "appliances.app_id": app_id
+        })
+        if found is not None:
+            return f"{app_id} already exist"
+        defaultValue = 0
+        if app_type == 'light':
+            defaultValue = '#000000'
+            
+        result = rooms.find_one_and_update({"room_id":room_id},{'$push': {'appliances': {'app_id': app_id,'app_type': app_type,'value': defaultValue}}})
+        return result
+    
+    @classmethod
+    def deleteAppliance(cls,room_id:str,app_id:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        })
+        if found is None:
+            return f"room_id: {room_id} doesnt exist"
+        found = rooms.find_one({
+            "room_id": room_id,
+            "appliances.app_id": app_id
+        })
+        if found is None:
+            return f"{app_id} doesnt exist"
+        result = rooms.find_one_and_update({"room_id":room_id},{"$pull": {"appliances": {'app_id': app_id}}})
+        return result
     @classmethod
     def createNewRecord(cls,_date = datetime.combine(datetime.today(), time.min) ):
         
@@ -84,51 +154,96 @@ class MongoAPI():
                 "date": _date,
                 "temperature": [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)],
                 "humidity": [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)],
-                "light": "#000000",
-                "fan": 0,
+                "brightness": [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)],
                 "door_log": []
             }
             found = records.insert_one(post)
             return found.inserted_id
         return found['_id']
     
-    @classmethod
-    def addTemp(cls,temp: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
-        date = date - timedelta(days=5)
-        id = MongoAPI.createNewRecord(date)
-        hour = date + timedelta(hours=hour)
-        if records.find_one({"_id": id,"temperature.hour": hour}) is None:
+    # @classmethod
+    # def addTemp(cls,temp: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
+    #     date = date - timedelta(days=5)
+    #     id = MongoAPI.createNewRecord(date)
+    #     hour = date + timedelta(hours=hour)
+    #     if records.find_one({"_id": id,"temperature.hour": hour}) is None:
             
-            result = records.find_one_and_update({"_id": id},{'$push': {'temperature': {'value': [temp],'hour': hour}}})
-            return result
+    #         result = records.find_one_and_update({"_id": id},{'$push': {'temperature': {'value': [temp],'hour': hour}}})
+    #         return result
             
-        return records.find_one_and_update({"_id": id, 'temperature.hour': hour},{'$push': {'temperature.$.value': temp}})
+    #     return records.find_one_and_update({"_id": id, 'temperature.hour': hour},{'$push': {'temperature.$.value': temp}})
+    
+    # @classmethod
+    # def addHumid(cls,humid: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
+    #     id = MongoAPI.createNewRecord(date)
+    #     hour = date + timedelta(hours=hour)
+    #     if records.find_one({"_id": id,"humidity.hour": hour}) is None:
+            
+    #         result = records.find_one_and_update({"_id": id},{'$push': {'humidity': {'value': [humid],'hour': hour}}})
+    #         return result
+        
+    #     return records.find_one_and_update({"_id": id, 'humidity.hour': hour},{'$push': {'humidity.$.value': humid}})
     
     @classmethod
-    def addHumid(cls,humid: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
+    def addLog(cls,option:int,value:float,date: datetime=datetime.combine(datetime.today(), time.min), hour: int = datetime.now().hour):
+        if option < 0 or option > 2:
+            raise ValueError("Invalid: option for addLog out of range")
+        if option == 0: #temp
+            field = 'temperature'
+        if option == 1: #humid
+            field = 'humidity'
+        if option == 2: #bright
+            field = 'brightness'
+        
         id = MongoAPI.createNewRecord(date)
-        hour = date + timedelta(hours=hour)
-        if records.find_one({"_id": id,"humidity.hour": hour}) is None:
+        hour = date + timedelta(hours = hour)
+        
+        if records.find_one({"_id": id,field+".hour": hour}) is None:
             
-            result = records.find_one_and_update({"_id": id},{'$push': {'humidity': {'value': [humid],'hour': hour}}})
+            result = records.find_one_and_update({"_id": id},{'$push': {'field': {'value': [value],'hour': hour}}})
             return result
         
-        return records.find_one_and_update({"_id": id, 'humidity.hour': hour},{'$push': {'humidity.$.value': humid}})
+        return records.find_one_and_update({"_id": id, field+".hour": hour},{'$push': {f'{field}.$.value': value}})
+         
     
     @classmethod
-    def updateLight(cls,val: str):
-        id = MongoAPI.createNewRecord()
-        result = records.find_one_and_update({"_id": id},{"$set": {"light": val}})
+    def updateAppliance(cls,room_id:str,app_id:str,app_type:str,val):
+        found = rooms.find_one({
+            "room_id": room_id
+        })
+        if found is None:
+            post = {
+                "room_id": room_id
+            }
+            return f"room_id: {room_id} doesnt exist"
+        found = rooms.find_one({
+            "room_id": room_id,
+            "appliances.app_id": app_id
+        })
+        if found is None:
+            return f"{app_id} doesnt exist"
+        result = rooms.find_one_and_update({"room_id": room_id,"appliances.app_id":app_id,"appliances.app_type":app_type},{"$set": {"appliances.$.value": val}})
         return result
     
-    @classmethod
-    def updateFan(cls,val: float):
-        id = MongoAPI.createNewRecord()
-        result = records.find_one_and_update({"_id": id},{"$set": {"fan": val}})
-        return result
     
     @classmethod
-    def getTempHumid(cls,limit_record: int,start_date: datetime,end_date : datetime = datetime.combine(datetime.today(), time.min)):
+    def getLog(cls,limit_record: int,start_date: datetime,end_date : datetime = datetime.combine(datetime.today(), time.min),current=False):
+        if current == True:
+            #print(start_date+ timedelta(hours=datetime.now().hour))
+            res = records.find({
+                'date': {
+                    '$gte': start_date,
+                    '$lte': end_date
+                },
+            
+            },
+                {
+                    "temperature": {"$elemMatch": {"hour" : start_date+ timedelta(hours=datetime.now().hour)}},
+                    "humidity": {"$elemMatch": {"hour" : start_date+ timedelta(hours=datetime.now().hour)}},
+                    "brightness": {"$elemMatch": {"hour" : start_date+ timedelta(hours=datetime.now().hour)}}
+                }
+            ).limit(limit_record)
+            return res
         res = records.find({
             'date': {
                 '$gte': start_date,
@@ -137,31 +252,15 @@ class MongoAPI():
         }).limit(limit_record)
         
         return res
-    
-    
-        
-        
-    
-    
-    
-# result = None
-for i in range(0,4):
-    #MongoAPI.addTemp(random.uniform(20, 40),i)
-    result = MongoAPI.addTemp(random.uniform(20, 40),i)
-    result = MongoAPI.addTemp(random.uniform(20, 40),i)
-    result = MongoAPI.addTemp(random.uniform(20, 40),i)
 
-# res  = records.aggregate([
-                
-#                 {'$unwind': '$temperature'},
-#                 {'$sort': {'temperature.hour': 1}},
-#                 {'$group': {
-#                     '_id': '$_id',
-#                     'temperature': {'$push': '$temperature'}
-#                 }},
-            
-#             ])
-# for i in res:
-#     print(i['temperature'])
+# start = 20
+# end = 45
+# for i in range(0,100):
+#     for j in range(0,24):
+#         for z in range(0,5):
+#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+   
 
 
