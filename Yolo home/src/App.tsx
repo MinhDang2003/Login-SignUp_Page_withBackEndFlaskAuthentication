@@ -7,6 +7,7 @@ import Missing from './pages/Missing.tsx';
 import RequireAuth from './component/RequireAuth.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import PersistLogin from './component/PersistLogin.tsx';
+import FaceRegFront from './pages/FaceRegFront.tsx';
 function App() {
   
 
