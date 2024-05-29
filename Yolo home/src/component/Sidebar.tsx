@@ -7,7 +7,7 @@ import "react-pro-sidebar/dist/css/styles.css";
 
 import { Link } from "react-router-dom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
+import FaceIcon from '@mui/icons-material/Face';
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 
@@ -36,7 +36,7 @@ const Item = ({ title, to, icon, selected, setSelected }: { title: string; to: s
     const [selected, setSelected] = useState("Home");
     return (
       
-      <Box 
+      <Box className="shadow-lg"
         sx={{
           height: "100%",
           "& .pro-sidebar-inner": {
@@ -102,7 +102,7 @@ const Item = ({ title, to, icon, selected, setSelected }: { title: string; to: s
               <Item
                 title="FaceReg Setup"
                 to="/FaceRegFront"
-                icon={<HelpOutlineOutlinedIcon />}
+                icon={<FaceIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
