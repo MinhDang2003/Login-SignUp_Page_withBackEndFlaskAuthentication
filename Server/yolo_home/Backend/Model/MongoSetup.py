@@ -86,6 +86,18 @@ class MongoAPI():
         return False
     
     @classmethod
+    def getRoom(cls,room_id:str):
+        found = rooms.find_one({
+            "room_id": room_id
+        },{"_id": 0})
+        return found
+    
+    @classmethod
+    def getAllRoom(cls):
+        return rooms.find({},{"_id": 0})
+    
+    
+    @classmethod
     def deleteRoom(cls,room_id:str):
         found = rooms.find_one_and_delete({"room_id": room_id})
         return found
@@ -182,7 +194,7 @@ class MongoAPI():
             field = 'humidity'
         if option == 2: #bright
             field = 'brightness'
-        
+        print(datetime.now())
         id = MongoAPI.createNewRecord(date)
         hour = date + timedelta(hours = hour)
         
@@ -196,6 +208,10 @@ class MongoAPI():
     
     @classmethod
     def updateAppliance(cls,room_id:str,app_id:str,app_type:str,val):
+        # print(room_id)
+        # print(app_id)
+        # print(app_type)
+        # print(val)
         found = rooms.find_one({
             "room_id": room_id
         })
@@ -206,11 +222,13 @@ class MongoAPI():
             return f"room_id: {room_id} doesnt exist"
         found = rooms.find_one({
             "room_id": room_id,
-            "appliances.app_id": app_id
+            "appliances.app_id": app_id,
+            "appliances.app_type": app_type
         })
+        #print(found)
         if found is None:
             return f"{app_id} doesnt exist"
-        result = rooms.find_one_and_update({"room_id": room_id,"appliances.app_id":app_id,"appliances.app_type":app_type},{"$set": {"appliances.$.value": val}})
+        result = rooms.find_one_and_update({"room_id": room_id,"appliances": {"$elemMatch": {"app_id": app_id,"app_type": app_type }}},{"$set": {"appliances.$.value": val}})
         return result
     
     
@@ -241,12 +259,14 @@ class MongoAPI():
         
         return res
 
-
-# for i in range(35,36):
+# start = 20
+# end = 45
+# for i in range(0,100):
 #     for j in range(0,24):
-#         MongoAPI.addLog(0,30,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
-#         MongoAPI.addLog(1,35,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
-#         MongoAPI.addLog(2,20,datetime.combine(datetime.today(), time.min)-timedelta(days=i),j)
+#         for z in range(0,5):
+#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
    
 
 

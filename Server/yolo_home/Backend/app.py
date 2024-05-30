@@ -104,7 +104,13 @@ def fan():
 def light():
     return Presenter.handle_update_light()
 
+@app.route("/api/getAllRoom",methods=['GET'])
+def getAllRoom():
+    return Presenter.getAllRoom()
 
+@app.route("/api/getRoom",methods=['POST'])
+def getRoom():
+    return Presenter.getRoom()
 
 
 if __name__ == "__main__":
