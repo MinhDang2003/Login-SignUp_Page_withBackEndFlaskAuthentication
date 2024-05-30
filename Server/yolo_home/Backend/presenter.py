@@ -120,14 +120,17 @@ class Presenter:
             start = datetime.combine(datetime.today(), time.min)
             end = datetime.combine(datetime.today(), time.min)
             res= MongoAPI.getLog(limit_record=1,start_date=start,end_date=end,current=True)
+            
             current_log = None
             for item in res:
+                print(item)
                 current_log = item[help_dict[choice]]
             if current_log is None:
                 current_log = 0
                 #return jsonify({f"{help_dict[choice]}": current_log}) , 200
                 return jsonify({f"value": current_log}) , 200
             #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
+        
             return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
                 
         if not ('option' in request.json):
@@ -302,9 +305,9 @@ class Presenter:
     
     @classmethod
     def _updateAppliances(cls,app_type:str,val):
-        # for item in ['room_id','appliance_id']:
-        #     if item not in request.json:
-        #         return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
+        for item in ['room_id','appliance_id']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
         room_id = request.json.get("room_id",None)
         app_id = request.json.get("appliance_id",None)
         result = MongoAPI.updateAppliance(room_id=room_id,app_id=app_id,app_type=app_type,val=val)
@@ -323,7 +326,7 @@ class Presenter:
             return jsonify({"msg": "Invalid level - out of range"}) , 400
         try:
             #AdaAPI().publishData(level,'fan')
-            print("update light")
+            print("update fan")
         except Exception as e:
             print(f"Error: {e}")
         else: 
