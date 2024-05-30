@@ -194,7 +194,7 @@ class MongoAPI():
             field = 'humidity'
         if option == 2: #bright
             field = 'brightness'
-        
+        print(datetime.now())
         id = MongoAPI.createNewRecord(date)
         hour = date + timedelta(hours = hour)
         
@@ -208,6 +208,10 @@ class MongoAPI():
     
     @classmethod
     def updateAppliance(cls,room_id:str,app_id:str,app_type:str,val):
+        # print(room_id)
+        # print(app_id)
+        # print(app_type)
+        # print(val)
         found = rooms.find_one({
             "room_id": room_id
         })
@@ -218,11 +222,13 @@ class MongoAPI():
             return f"room_id: {room_id} doesnt exist"
         found = rooms.find_one({
             "room_id": room_id,
-            "appliances.app_id": app_id
+            "appliances.app_id": app_id,
+            "appliances.app_type": app_type
         })
+        #print(found)
         if found is None:
             return f"{app_id} doesnt exist"
-        result = rooms.find_one_and_update({"room_id": room_id,"appliances.app_id":app_id,"appliances.app_type":app_type},{"$set": {"appliances.$.value": val}})
+        result = rooms.find_one_and_update({"room_id": room_id,"appliances": {"$elemMatch": {"app_id": app_id,"app_type": app_type }}},{"$set": {"appliances.$.value": val}})
         return result
     
     

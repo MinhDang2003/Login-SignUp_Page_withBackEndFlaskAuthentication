@@ -8,8 +8,7 @@ from Ada import AdaAPI,MongoAPI,hash_password
 from datetime import date,datetime,time,timedelta
 from statistics import mean 
 import uuid
-
-
+import re
     
 class Presenter:
     def __init__(self) -> None:
@@ -130,8 +129,10 @@ class Presenter:
                 #return jsonify({f"{help_dict[choice]}": current_log}) , 200
                 return jsonify({f"value": current_log}) , 200
             #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
-        
-            return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
+            try:
+                return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
+            except:
+                return jsonify({f"value": 0}) , 200 
                 
         if not ('option' in request.json):
             
@@ -231,7 +232,7 @@ class Presenter:
     @classmethod
     def handle_add_temp(cls,val: float):
         try:
-            AdaAPI().publishData(val,'temperature')
+            AdaAPI().publishData(val,'temp')
         except Exception as e:
             print(f"Error: {e}")
         else: 
@@ -325,7 +326,7 @@ class Presenter:
         if level < 0 or level > 100:
             return jsonify({"msg": "Invalid level - out of range"}) , 400
         try:
-            #AdaAPI().publishData(level,'fan')
+            AdaAPI().publishData(level,'speed')
             print("update fan")
         except Exception as e:
             print(f"Error: {e}")
@@ -345,10 +346,17 @@ class Presenter:
         if 'color' not in request.json:
             return jsonify({"msg": "Invalid update request light - missing color field"}) , 400
         color = request.json.get('color',None)
-        if color not in ['#000000','#111111','#c4e024']:
-            return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#111111','#c4e024']}"}) , 400
+        if color not in ['#000000','#ffffff','#c4e024']:
+            return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#ffffff','#c4e024']}"}) , 400
+        id = request.json.get('appliance_id',None)
+        match = re.search(r'\d+', id)
+        if match:
+            number = int(match.group()) % 4
+        if number == 0: number = 4
+        feed_name = f'led{number}'
+        
         try:
-            #AdaAPI().publishData(color,'light')
+            AdaAPI().publishData(color,feed_name)
             print("update light")
         except Exception as e:
             print(f"Error: {e}")
