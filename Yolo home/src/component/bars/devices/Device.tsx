@@ -15,10 +15,10 @@ function Device(data){
         isOn = Number(devices.value)/50
     }
     else if (devices.app_type=="light"){
-      if (devices.value == "rgb(0,0,0)"){
+      if (devices.value == "#000000"){
         isOn = 0
       }
-      else if (devices.value == "rgb(255,255,255)"){
+      else if (devices.value == "#ffffff"){
         isOn = 1
       }
       else{

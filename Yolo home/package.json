@@ -21,6 +21,7 @@
     "react-hook-form": "^7.51.3",
     "react-pro-sidebar": "^0.7.1",
     "react-router-dom": "6.4",
+    "reactjs-popup": "^2.0.6",
     "styled-components": "^6.1.11"
   },
   "devDependencies": {

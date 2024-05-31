@@ -7,21 +7,160 @@ import {getAllRoomsData,getDevicesOfRoom,toggleDevice} from '../business/HomePag
 import RoomBar from '../component/bars/rooms/RoomsBar'
 import DevicesBar from '../component/bars/devices/DevicesBar'
 import { tokens } from "../theme.tsx";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import RoomsApi from '../api_copy/RoomsApi'
+import DeviceApi from '../api_copy/DeviceApi'
+const styles = {
+    modal: {
+        position: 'relative' as 'relative',
+        padding: '20px',
+        border: '2px solid black',
+        borderRadius: '10px',
+        backgroundColor: '#f9f9f9',
+    },
+    form: {
+        display: 'flex',
+        flexDirection: 'column' as 'column',
+        alignItems: 'center',
+        marginTop: '30px', // Added margin to push form down below close button
+    },
+    label: {
+        color: 'black',
+        backgroundColor: 'beige',
+        padding: '10px',
+        borderRadius: '5px',
+        fontWeight: 'bold' as 'bold',
+        marginBottom: '10px',
+        width: '100%',
+        textAlign: 'left' as 'left',
+    },
+    input: {
+        backgroundColor: 'white',
+        color: 'black',
+        border: '2px solid black',
+        borderRadius: '5px',
+        padding: '10px',
+        width: '100%',
+        boxSizing: 'border-box' as 'border-box',
+        marginBottom: '15px',
+    },
+    submitButton: {
+        backgroundColor: 'beige',
+        color: 'black',
+        border: '2px solid black',
+        borderRadius: '5px',
+        padding: '10px 20px',
+        cursor: 'pointer',
+        fontWeight: 'bold' as 'bold',
+    },
+    closeButton: {
+        position: 'absolute' as 'absolute',
+        top: '10px',
+        right: '10px',
+        backgroundColor: 'black',
+        color: 'white',
+        border: 'none',
+        borderRadius: '0%', // Make the button square
+        width: '30px',
+        height: '30px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        fontWeight: 'bold' as 'bold',
+        fontSize: '20px',
+        lineHeight: '20px',
+    },
+    errorMessage: {
+        color: 'red',
+        fontWeight: 'bold' as 'bold',
+        textAlign: 'center' as 'center',
+    },
+};
 
 function Dashboard() {
+	const [inputs, setInputs] = useState({});
+
+	const handleChange = (event) => {
+	  const name = event.target.name;
+	  const value = event.target.value;
+	  setInputs(values => ({...values, [name]: value}))
+	}
+	const [triggerRender, setTriggerRender] = useState(false);
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, close: () => void) =>{
+	  event.preventDefault();
+	  console.log(inputs);
+	  console.log(event.target.name)
+	  if (event.target.name == "addRoom"){
+		try {
+			const res = await RoomsApi.addRoom(inputs.roomID);
+            console.log(res,3122)
+			console.log('Room added:', inputs.roomID);
+			setTriggerRender(!triggerRender);
+			close();
+		} catch (error) {
+			console.error('Error adding room:', error);
+            setError((error as Error).response.data.msg || 'An error occurred');
+            close();
+		}
+	  }
+	  else if (event.target.name == "removeRoom"){
+		try {
+			await RoomsApi.removeRoom(inputs.roomID);
+			console.log('Room removed:', inputs.roomID);
+			setTriggerRender(!triggerRender);
+			close();
+		} catch (error) {
+            setError((error as Error).response.data.msg || 'An error occurred');
+            close();
+		}
+	  }
+	  else if (event.target.name == "addDevice"){
+		try {
+			await DeviceApi.addDevice(inputs.roomID,inputs.deviceID,inputs.deviceType);
+			console.log('Device added:', inputs.roomID, inputs.deviceID,inputs.deviceType);
+			setTriggerRender(!triggerRender);
+			close();
+		} catch (error) {
+            setError((error as Error).response.data.msg || 'An error occurred');
+            close();
+		}
+	  }
+	  else if (event.target.name == "removeDevice"){
+		try {
+			const res =  await DeviceApi.removeDevice(inputs.roomID,inputs.deviceID);
+			console.log('Device removed:', inputs.roomID, inputs.deviceID);
+			setTriggerRender(!triggerRender);
+			close();
+		} catch (error) {
+            setError((error as Error).response.data.msg || 'An error occurred');
+            close();
+            
+		}
+	  }
+	}
+    const closeErrorPopup = () => {
+        setError(null);
+    };
+    const [error, setError] = useState<string | null>(null);
 	const [count, setCount] = useState(0)
     const [data, setData] = useState([])
-    const [selectedRoom, setSelectedRoom] = useState("0")
+    const [selectedRoom, setSelectedRoom] = useState("{:::}")
     const [toggleData,setToggleData] = useState(null)
     const [devicesData, setDevicesData] = useState({signal:[],devices:[]})
     useEffect(()=>{
       const getData = async () => {
         const res = await getAllRoomsData()
         setData(res)
+        console.log(res,66666)
+        if (selectedRoom=="{:::}" || !res.some((item) => item.room_id === selectedRoom)){
         setSelectedRoom(res[0].room_id)
+        console.log(333999)
+        }
       }
       getData()
-    }, []
+    }, [triggerRender]
     )
     useEffect(()=> {
       const getData = async () => {
@@ -46,6 +185,12 @@ function Dashboard() {
           toggle()
       }
     },[toggleData])
+    useEffect(() => {
+        setTimeout(()=>{
+            setCount((count+1)%2)
+          },1000)  
+        // Any logic that needs to run after state change
+    }, [triggerRender]);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 	return (
@@ -58,15 +203,167 @@ function Dashboard() {
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<h1>Add Room</h1>
+						<Popup trigger=
+                {<button> Press to add room </button>} 
+                modal nested>
+            {close => (
+                <div className='modal' style={styles.modal}>
+				<button onClick={close} style={styles.closeButton}>
+					&times;
+				</button>
+				<form name="addRoom" onSubmit={(event) => handleSubmit(event, close)} style={styles.form}>
+					<label style={styles.label}>
+						Enter room ID to add:
+					</label>
+					<input 
+						style={styles.input}
+						type="text" 
+						name="roomID" 
+						value={inputs.roomID || ""} 
+						onChange={handleChange}
+					/>
+					<input 
+						type="submit" 
+						style={styles.submitButton} 
+					/>
+				</form>
+			</div>
+            )}
+            </Popup>
 					</div>
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<h1>Add Device</h1>
+						<Popup 
+                trigger={<button>Press to add device</button>} 
+                modal 
+                nested
+            >
+                {close => (
+                    <div className='modal' style={styles.modal}>
+                        <button onClick={close} style={styles.closeButton}>
+                            &times;
+                        </button>
+                        <form name="addDevice" onSubmit={(event) => handleSubmit(event, close)} style={styles.form}>
+                            <label style={styles.label}>
+                                Enter room ID to add device:
+                                <input 
+                                    style={styles.input}
+                                    type="text" 
+                                    name="roomID" 
+                                    value={inputs.roomID || ""} 
+                                    onChange={handleChange}
+                                />
+                            </label>
+                            <label style={styles.label}>
+                                Enter device ID to add:
+                                <input 
+                                    style={styles.input}
+                                    type="text" 
+                                    name="deviceID" 
+                                    value={inputs.deviceID || ""} 
+                                    onChange={handleChange}
+                                />
+                            </label>
+                            <label style={styles.label}>
+                                Enter the device type:
+                                <input 
+                                    style={styles.input}
+                                    type="text" 
+                                    name="deviceType" 
+                                    value={inputs.deviceType || ""} 
+                                    onChange={handleChange}
+                                />
+                            </label>
+                            <input 
+                                type="submit" 
+                                style={styles.submitButton} 
+                            />
+                        </form>
+                    </div>
+                )}
+            </Popup>
 					</div>
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<h1>Remove Room</h1>
+						<Popup trigger=
+                {<button> Press to remove room </button>} 
+                modal nested>
+            {close => (
+                <div className='modal' style={styles.modal}>
+				<button onClick={close} style={styles.closeButton}>
+					&times;
+				</button>
+				<form name="removeRoom" onSubmit={(event) => handleSubmit(event, close)}  style={styles.form}>
+					<label style={styles.label}>
+						Enter room ID to remove:
+					</label>
+					<input 
+						style={styles.input}
+						type="text" 
+						name="roomID" 
+						value={inputs.roomID || ""} 
+						onChange={handleChange}
+					/>
+					<input 
+						type="submit" 
+						style={styles.submitButton} 
+					/>
+				</form>
+			</div>
+            )}
+            </Popup>
 					</div>
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<h1>Remove Device</h1>
+						<Popup 
+                trigger={<button>Press to remove device</button>} 
+                modal 
+                nested
+            >
+                {close => (
+                    <div className='modal' style={styles.modal}>
+                        <button onClick={close} style={styles.closeButton}>
+                            &times;
+                        </button>
+                        <form name="removeDevice" onSubmit={(event) => handleSubmit(event, close)}  style={styles.form}>
+                            <label style={styles.label}>
+                                Enter room ID to remove device:
+                                <input 
+                                    style={styles.input}
+                                    type="text" 
+                                    name="roomID" 
+                                    value={inputs.roomID || ""} 
+                                    onChange={handleChange}
+                                />
+                            </label>
+                            <label style={styles.label}>
+                                Enter device ID to remove:
+                                <input 
+                                    style={styles.input}
+                                    type="text" 
+                                    name="deviceID" 
+                                    value={inputs.deviceID || ""} 
+                                    onChange={handleChange}
+                                />
+                            </label>
+                            <input 
+                                type="submit" 
+                                style={styles.submitButton} 
+                            />
+                        </form>
+                    </div>
+                )}
+            </Popup>
+            {error && (
+                <Popup open={true} onClose={closeErrorPopup} modal>
+                    <div className='modal' style={styles.modal}>
+                        <button onClick={closeErrorPopup} style={styles.closeButton}>
+                            &times;
+                        </button>
+                        <div style={styles.errorMessage}>{error}</div>
+                    </div>
+                </Popup>
+            )}
 					</div>
 				</div>
 				<div className="mt-5  items-center bg-[#DAC0A3] shadow-xl ">
@@ -87,5 +384,6 @@ function Dashboard() {
 			</div>
 		</div>
 	);
+	
 }
 export default Dashboard;

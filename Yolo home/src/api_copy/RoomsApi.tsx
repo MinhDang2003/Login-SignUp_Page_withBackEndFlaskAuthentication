@@ -20,6 +20,14 @@ async function getDevicesByRoomID(roomID){
         return {}
     }
 }
+async function addRoom(roomID: any){
+        const devices = await axiosPublic.post("/api/new_room",{room_id: roomID});
+        return devices
+}
+async function removeRoom(roomID: any){
+    const devices = await axiosPublic.post("/api/del_room",{room_id: roomID});
+    return devices
+}
 
-const RoomsAPI = {getAllRooms,getDevicesByRoomID} 
+const RoomsAPI = {getAllRooms,getDevicesByRoomID,addRoom,removeRoom} 
 export default RoomsAPI
