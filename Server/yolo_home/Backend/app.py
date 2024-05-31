@@ -112,7 +112,13 @@ def getAllRoom():
 def getRoom():
     return Presenter.getRoom()
 
+@app.route("/api/getTrainImgs",methods= ['POST'])
+def uploadImg():
+    return Presenter.getImgs()
 
+@app.route("/api/verification",methods=['POST'])
+def verify():
+    return Presenter.verify()
 if __name__ == "__main__":
     app.run(debug=True,port=8090)
     
