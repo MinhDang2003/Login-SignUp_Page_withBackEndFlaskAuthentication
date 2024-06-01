@@ -100,8 +100,8 @@ const Item = ({ title, to, icon, selected, setSelected }: { title: string; to: s
                 setSelected={setSelected}
               />
               <Item
-                title="FaceReg Setup"
-                to="/FaceRegFront"
+                title="FaceRec Setup"
+                to="/FaceRecFront"
                 icon={<FaceIcon />}
                 selected={selected}
                 setSelected={setSelected}

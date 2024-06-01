@@ -7,7 +7,7 @@ import Missing from './pages/Missing.tsx';
 import RequireAuth from './component/RequireAuth.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import PersistLogin from './component/PersistLogin.tsx';
-import FaceRegFront from './pages/FaceRegFront.tsx';
+import FaceRecFront from './pages/FaceRecFront.tsx';
 function App() {
   
 
@@ -25,7 +25,7 @@ function App() {
               <Route element={<RequireAuth></RequireAuth>}>
                 <Route path='/' element={<Home></Home>}/>
                 <Route path='/Dashboard' element={<Dashboard></Dashboard>}/>
-                <Route path='/FaceRegFront' element={<FaceRegFront></FaceRegFront>}/>
+                <Route path='/FaceRecFront' element={<FaceRecFront></FaceRecFront>}/>
               </Route>
             </Route>
             
