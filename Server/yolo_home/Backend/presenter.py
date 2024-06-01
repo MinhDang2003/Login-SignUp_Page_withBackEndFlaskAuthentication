@@ -8,9 +8,10 @@ from Ada import AdaAPI,MongoAPI,hash_password
 from datetime import date,datetime,time,timedelta
 from statistics import mean 
 import uuid
+import re
+import numpy as np
+import cv2
 
-
-    
 class Presenter:
     def __init__(self) -> None:
         pass
@@ -98,8 +99,8 @@ class Presenter:
         email = get_jwt_identity()
         found = MongoAPI.getUserInfo(email)
         response_body = {
-            "name": found["name"],
-            "about" :"Hello! I'm a full stack developer that loves python and javascript"
+            "name": found["name"]
+            #"about" :"Hello! I'm a full stack developer that loves python and javascript"
         }
         return jsonify({"msg":"Successful get user info","user": response_body}), 200
     
@@ -128,7 +129,10 @@ class Presenter:
                 #return jsonify({f"{help_dict[choice]}": current_log}) , 200
                 return jsonify({f"value": current_log}) , 200
             #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
-            return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
+            try:
+                return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
+            except:
+                return jsonify({f"value": 0}) , 200 
                 
         if not ('option' in request.json):
             
@@ -228,7 +232,7 @@ class Presenter:
     @classmethod
     def handle_add_temp(cls,val: float):
         try:
-            AdaAPI().publishData(val,'temperature')
+            AdaAPI().publishData(val,'temp')
         except Exception as e:
             print(f"Error: {e}")
         else: 
@@ -322,8 +326,8 @@ class Presenter:
         if level < 0 or level > 100:
             return jsonify({"msg": "Invalid level - out of range"}) , 400
         try:
-            #AdaAPI().publishData(level,'fan')
-            print("update light")
+            AdaAPI().publishData(level,'speed')
+            print("update fan")
         except Exception as e:
             print(f"Error: {e}")
         else: 
@@ -342,10 +346,17 @@ class Presenter:
         if 'color' not in request.json:
             return jsonify({"msg": "Invalid update request light - missing color field"}) , 400
         color = request.json.get('color',None)
-        if color not in ['#000000','#111111','#c4e024']:
-            return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#111111','#c4e024']}"}) , 400
+        if color not in ['#000000','#ffffff','#c4e024']:
+            return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#ffffff','#c4e024']}"}) , 400
+        id = request.json.get('appliance_id',None)
+        match = re.search(r'\d+', id)
+        if match:
+            number = int(match.group()) % 4
+        if number == 0: number = 4
+        feed_name = f'led{number}'
+        
         try:
-            #AdaAPI().publishData(color,'light')
+            AdaAPI().publishData(color,feed_name)
             print("update light")
         except Exception as e:
             print(f"Error: {e}")
@@ -377,3 +388,33 @@ class Presenter:
             return jsonify(({"msg": f"Successful get room: {room_id}",'rooms': dict(result)})) , 200
         else :
             return jsonify({"msg": f"room_id: {room_id} doesnt exist"}) , 400
+        
+    @classmethod
+    def getImgs(cls):
+        if 'img_arr' not in request.json:
+            return jsonify({"msg": "Invalid getImgs request - missing img_arr field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid getImgs request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Upload Successfully"}) , 200
+    
+    @classmethod
+    def getImgs(cls):
+        if 'img_arr' not in request.json:
+            return jsonify({"msg": "Invalid uploadImg request - missing img_arr field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid uploadImg request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Upload Successfully"}) , 200
+    
+    @classmethod
+    def verify(cls):
+        if 'input_img' not in request.json:
+            return jsonify({"msg": "Invalid verify request - missing input_img field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid verify request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Successfully" , "verified": 1}) , 200
