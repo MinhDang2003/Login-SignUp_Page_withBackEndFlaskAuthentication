@@ -23,7 +23,7 @@ function FaceRecFront() {
             intervalId = setInterval(() => {
                 setCountdown((prevCountdown) => prevCountdown - 1);
                 captureImage();
-            }, 1000); // Capture image every second
+            }, 100); // Capture 10 images every second
         } else if (countdown === 0) {
             clearInterval(intervalId);
             setIsCapturing(false);
