@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import "../App.css";
 import Sidebar from "../component/Sidebar";
 import Webcam from "react-webcam";
+import {axiosPublic} from '../api/axios';
+import axios from "axios";
 
 function FaceRecFront() {
     const instruction = [
@@ -16,7 +18,7 @@ function FaceRecFront() {
     const [countdown, setCountdown] = useState(15);
     const [isCapturing, setIsCapturing] = useState(false);
     const [capturedImages, setCapturedImages] = useState([]);
-
+    const [name, setName] = useState("");
     useEffect(() => {
         let intervalId;
         if (isCapturing && countdown > 0) {
@@ -45,18 +47,16 @@ function FaceRecFront() {
         }
     };
 
-    const sendImagesToBackend = () => {
-        const endpoint = "https://your-backend-endpoint.com/api/upload";
-        fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ images: capturedImages }),
+    const sendImagesToBackend = async () => {
+        const response = await axiosPublic.post("/users/profile");
+        setName(response.data.name);
+        axiosPublic.post("/api/getTrainImgs", {  name: name,img_arr: capturedImages })
+        .then(response => {
+            console.log(response.data);
         })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+        });
     };
 
     return (
