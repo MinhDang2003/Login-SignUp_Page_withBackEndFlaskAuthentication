@@ -60,7 +60,7 @@ function Dashboard() {
 	
 
 	useEffect(() => {
-		setInterval(getCurrentStat,5000);
+		setInterval(getCurrentStat,30000);
 		fetchData(0); // Fetch initial data for day mode
 		fetchData(1);
 		fetchData(2);

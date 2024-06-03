@@ -198,7 +198,7 @@ class MongoAPI():
             field = 'humidity'
         if option == 2: #bright
             field = 'brightness'
-        print(datetime.now())
+        #print(datetime.now())
         id = MongoAPI.createNewRecord(date)
         hour = date + timedelta(hours = hour)
         
@@ -281,10 +281,10 @@ class MongoAPI():
 
 # start = 20
 # end = 45
-# for i in range(0,100):
+# for i in range(0,22):
 #     for j in range(0,24):
-#         for z in range(0,5):
-#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
-#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
-#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#         for z in range(0,4):
+#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
+#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
+#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
    

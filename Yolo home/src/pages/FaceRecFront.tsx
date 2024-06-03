@@ -4,7 +4,7 @@ import Sidebar from "../component/Sidebar";
 import Webcam from "react-webcam";
 import {axiosPublic} from '../api/axios';
 import axios from "axios";
-
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 function FaceRecFront() {
     const instruction = [
         "Move your head slowly to the right",
@@ -14,6 +14,7 @@ function FaceRecFront() {
         "Move your head slowly back to normal",
         "Success",
     ];
+    const axiosPrivate = useAxiosPrivate()
     const webcamRef = useRef(null);
     const [countdown, setCountdown] = useState(15);
     const [isCapturing, setIsCapturing] = useState(false);
@@ -25,7 +26,7 @@ function FaceRecFront() {
             intervalId = setInterval(() => {
                 setCountdown((prevCountdown) => prevCountdown - 1);
                 captureImage();
-            }, 100); // Capture 10 images every second
+            }, 10); // Capture 10 images every second
         } else if (countdown === 0) {
             clearInterval(intervalId);
             setIsCapturing(false);
@@ -48,9 +49,9 @@ function FaceRecFront() {
     };
 
     const sendImagesToBackend = async () => {
-        const response = await axiosPublic.post("/users/profile");
+        const response = await axiosPrivate.get("/users/profile");
         setName(response.data.name);
-        axiosPublic.post("/api/getTrainImgs", {  name: name,img_arr: capturedImages })
+        axiosPrivate.post("/api/getTrainImgs", {  name: name,img_arr: capturedImages })
         .then(response => {
             console.log(response.data);
         })
@@ -69,7 +70,7 @@ function FaceRecFront() {
                     <h1 className="text-black font-serif text-center text-7xl">Face Recognition Setup</h1>
                     <div className="mt-5 flex justify-center items-center ">
                         <div className="overflow-hidden p-3 bg-[#DAC0A3]" style={{ width: "70%", height: "auto" }}>
-                            <Webcam ref={webcamRef} mirrored={true} screenshotFormat="image/jpeg" />
+                            <Webcam ref={webcamRef} mirrored={false} screenshotFormat="image/jpeg" />
                         </div>
                     </div>
                     <div className="mt-5 flex justify-center items-center w-full">
@@ -87,8 +88,8 @@ function FaceRecFront() {
                     </div>
                 </div>
             </div>
-        </div>
-    );
-}
+        </div>  
+    );      
+}   
 
 export default FaceRecFront;
