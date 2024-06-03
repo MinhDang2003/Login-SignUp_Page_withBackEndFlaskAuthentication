@@ -5,6 +5,10 @@ from pymongo import ASCENDING
 from pymongo.server_api import ServerApi
 import random
 import hashlib, binascii, os
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+import pandas as pd
+from deepface import DeepFace
 
 def hash_password(password: str):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
@@ -103,7 +107,7 @@ class MongoAPI():
         return found
     
     @classmethod
-    def addAppliance(cls,room_id:str,app_id:str,app_type:str):
+    def addAppliance(cls,room_id:str,app_id:str,app_type:str,feed_id:str):
         found = rooms.find_one({
             "room_id": room_id
         })
@@ -122,7 +126,7 @@ class MongoAPI():
         if app_type == 'light':
             defaultValue = '#000000'
             
-        result = rooms.find_one_and_update({"room_id":room_id},{'$push': {'appliances': {'app_id': app_id,'app_type': app_type,'value': defaultValue}}})
+        result = rooms.find_one_and_update({"room_id":room_id},{'$push': {'appliances': {'app_id': app_id,'app_type': app_type,'value': defaultValue,'feed_id': feed_id}}})
         return result
     
     @classmethod
@@ -220,17 +224,33 @@ class MongoAPI():
                 "room_id": room_id
             }
             return f"room_id: {room_id} doesnt exist"
-        found = rooms.find_one({
-            "room_id": room_id,
-            "appliances.app_id": app_id,
-            "appliances.app_type": app_type
-        })
-        #print(found)
+        pipeline = [
+            {"$match": {"room_id": room_id}},
+            {"$unwind": "$appliances"},
+            {"$match": {"appliances.app_id": app_id, "appliances.app_type": app_type}}
+        ]
+
+        found_ = (rooms.aggregate(pipeline))
+        found = None
+        for f in found_:
+            found = dict(f)
+        
         if found is None:
             return f"{app_id} doesnt exist"
+        feed_id = found['appliances']['feed_id']
+        
         result = rooms.find_one_and_update({"room_id": room_id,"appliances": {"$elemMatch": {"app_id": app_id,"app_type": app_type }}},{"$set": {"appliances.$.value": val}})
-        return result
+        return result , feed_id
     
+    @classmethod
+    def addEmbeddings(cls,embeddings,email):
+        found = users.find_one_and_update({"email": email},{'$set': {'embeddings': embeddings}},return_document=True)
+        return found
+    
+    @classmethod
+    def getEmbedding(cls,email):
+        found = users.find_one({"email": email})
+        return found
     
     @classmethod
     def getLog(cls,limit_record: int,start_date: datetime,end_date : datetime = datetime.combine(datetime.today(), time.min),current=False):

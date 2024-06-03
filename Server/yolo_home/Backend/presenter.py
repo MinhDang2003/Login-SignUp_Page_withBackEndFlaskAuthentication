@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from tqdm import tqdm
 from typing import Protocol
 from flask import request,jsonify,make_response
 from flask_jwt_extended import create_access_token, create_refresh_token, unset_jwt_cookies,get_jwt_identity
@@ -9,7 +9,16 @@ from datetime import date,datetime,time,timedelta
 from statistics import mean 
 import uuid
 import re
-    
+import numpy as np
+import cv2
+from deepface import DeepFace
+import os
+import pandas as pd
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
+import base64
+from PIL import Image
+import io
+
 class Presenter:
     def __init__(self) -> None:
         pass
@@ -97,8 +106,8 @@ class Presenter:
         email = get_jwt_identity()
         found = MongoAPI.getUserInfo(email)
         response_body = {
-            "name": found["name"],
-            "about" :"Hello! I'm a full stack developer that loves python and javascript"
+            "name": found["name"]
+            #"about" :"Hello! I'm a full stack developer that loves python and javascript"
         }
         return jsonify({"msg":"Successful get user info","user": response_body}), 200
     
@@ -276,13 +285,14 @@ class Presenter:
     
     @classmethod
     def addAppliances(cls):
-        for item in ['room_id','appliance_id','appliance_type']:
+        for item in ['room_id','appliance_id','appliance_type','feed_id']:
             if item not in request.json:
                 return jsonify({"msg": f"Invalid add appliances request - missing {item} field"}) , 400
         room_id = request.json.get("room_id",None)
         app_id = request.json.get("appliance_id",None)
         app_type = request.json.get("appliance_type",None)
-        result = MongoAPI.addAppliance(room_id=room_id,app_id=app_id,app_type=app_type)
+        feed_id = request.json.get("feed_id",None)
+        result = MongoAPI.addAppliance(room_id=room_id,app_id=app_id,app_type=app_type,feed_id=feed_id)
         if type(result) is str:
             return jsonify({"msg": result}) , 400
         if result is None:
@@ -325,18 +335,16 @@ class Presenter:
         level = request.json.get('level',None)
         if level < 0 or level > 100:
             return jsonify({"msg": "Invalid level - out of range"}) , 400
-        try:
-            AdaAPI().publishData(level,'speed')
-            print("update fan")
-        except Exception as e:
-            print(f"Error: {e}")
-        else: 
-            result = Presenter._updateAppliances('fan',level)
-            if type(result) is str:
-                return jsonify({"msg": result}) , 400
-            if result is None:
-                return jsonify({"msg": "Failed to update fan"}) , 400
-            return jsonify({"msg": "Successful"}) , 200 
+        
+        result = Presenter._updateAppliances('fan',level)
+        if type(result) is str:
+            return jsonify({"msg": result}) , 400
+        
+        if type(result) is not tuple:
+            return jsonify({"msg": "Failed to update fan"}) , 400
+        result , feed_id = result
+        AdaAPI().publishData(level,feed_id)
+        return jsonify({"msg": "Successful"}) , 200 
     
     @classmethod
     def handle_update_light(cls):
@@ -348,25 +356,15 @@ class Presenter:
         color = request.json.get('color',None)
         if color not in ['#000000','#ffffff','#c4e024']:
             return jsonify({"msg": f"Invalid color {color}, must be one of {['#000000','#ffffff','#c4e024']}"}) , 400
-        id = request.json.get('appliance_id',None)
-        match = re.search(r'\d+', id)
-        if match:
-            number = int(match.group()) % 4
-        if number == 0: number = 4
-        feed_name = f'led{number}'
         
-        try:
-            AdaAPI().publishData(color,feed_name)
-            print("update light")
-        except Exception as e:
-            print(f"Error: {e}")
-        else: 
-            result = Presenter._updateAppliances('light',color)
-            if type(result) is str:
-                return jsonify({"msg": result}) , 400
-            if result is None:
-                return jsonify({"msg": "Failed to update light"}) , 400
-            return jsonify({"msg": "Successful"}) , 200 
+        result = Presenter._updateAppliances('light',color)
+        if type(result) is str:
+            return jsonify({"msg": result}) , 400
+        if type(result) is not tuple:
+            return jsonify({"msg": "Failed to update fan"}) , 400
+        result , feed_id = result
+        AdaAPI().publishData(color,feed_id)
+        return jsonify({"msg": "Successful"}) , 200 
     
     @classmethod
     def getAllRoom(cls):
@@ -388,3 +386,89 @@ class Presenter:
             return jsonify(({"msg": f"Successful get room: {room_id}",'rooms': dict(result)})) , 200
         else :
             return jsonify({"msg": f"room_id: {room_id} doesnt exist"}) , 400
+        
+    @classmethod
+    def getImgs(cls):
+        if 'img_arr' not in request.json:
+            return jsonify({"msg": "Invalid getImgs request - missing img_arr field"}) , 400
+        # if 'name' not in request.json:
+        #     return jsonify({"msg": "Invalid getImgs request - missing name field"}) , 400
+        # name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)[:10]
+        print(len(img_arr))
+        # facial_img_path = img_arr[0]  
+        # facial_img_path = facial_img_path.split(",")[1]
+        # image_bytes = base64.b64decode(facial_img_path)
+        # image_buf = io.BytesIO(image_bytes)
+        # image = Image.open(image_buf)
+        # image_rgb = image.convert('RGB')
+
+        # image_rgb.save('output_image.jpeg')
+
+        instances = []
+        embedding_vector = None
+        for i in tqdm(range(0, len(img_arr))):
+            # facial_img_path = img_arr[i]  
+            # #print(img_arr[i] )
+            # facial_img_path = facial_img_path.split(",")[1]
+
+            # #facial_img_path += "=" * ((4 - len(facial_img_path) % 4) % 4)
+            # image_bytes = base64.b64decode(facial_img_path)
+            # image_buf = io.BytesIO(image_bytes)
+            # image = Image.open(image_buf)
+            # image.show()
+            try:  
+                embedding = DeepFace.represent(img_path = img_arr[i], model_name = "Facenet")[0]["embedding"]
+            except Exception as e:
+                return jsonify({"msg": str(e)}) , 400
+                
+            instances.append(embedding)
+            if embedding_vector is None:
+                embedding_vector = np.array(embedding)
+            else:
+                current_embedding = np.array(embedding)
+                dist = np.linalg.norm(embedding_vector-current_embedding)
+                if dist <= 10.0:
+                    continue
+                else:
+                    return jsonify({"msg": "Not same face"}) , 400
+            
+        
+        email = get_jwt_identity()
+        result = MongoAPI.addEmbeddings(instances,email)
+        if result is None:
+            return jsonify({"msg": "add Embeddings to db failed"}) , 400
+        
+        return jsonify({"msg": "Upload Successfully"}) , 200
+    
+    @classmethod
+    def verify(cls):
+        
+        if 'input_img' not in request.json:
+            return jsonify({"msg": "Invalid verify request - missing input_img field"}) , 400
+        input_img = request.json.get('input_img',None)
+        if (len(input_img)) > 0:
+            img_arr = input_img[0]
+        else: 
+            return jsonify({"msg": "No image was sent back"}) , 400
+        try:  
+            embedding = DeepFace.represent(img_path = img_arr, model_name = "Facenet")[0]["embedding"]
+        except Exception as e:
+            return jsonify({"msg": str(e)}) , 400
+        found = dict(MongoAPI.getEmbedding(get_jwt_identity()))
+        if 'embeddings' not in found.keys():
+            return jsonify({"msg": "No user face info in database"}) , 400
+        count = 0
+        length = len(found['embeddings'])
+        
+        for em in found['embeddings']:
+            dist = np.linalg.norm(np.array(embedding)-np.array(em))
+            print(dist)
+            if dist > 10:
+                continue
+            count += 1
+        print(count)
+        if count * 1.0 / length < 0.7:
+            return jsonify({"msg": "Successfully" , "verified": 'false'}) , 200
+            
+        return jsonify({"msg": "Successfully" , "verified": 'true'}) , 200
