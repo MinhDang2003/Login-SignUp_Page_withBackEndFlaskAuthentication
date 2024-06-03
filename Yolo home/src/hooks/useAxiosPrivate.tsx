@@ -12,9 +12,10 @@ const useAxiosPrivate = () => {
         const requestIntercept = axiosPrivate.interceptors.request.use(
             
             config => {
-                
+                 
                 if (!config.headers['Authorization']) {
                     if (auth?.token !== "") {
+                        
                         config.headers['Authorization'] = `Bearer ${auth?.token}`;
                     }
 
@@ -27,7 +28,7 @@ const useAxiosPrivate = () => {
             response => response,
             async (error) => { 
                 const prevRequest = error?.config;
-               
+                
                 if (error?.response?.status === 401 && !prevRequest?._sent) {
                     
                     prevRequest._sent = true

@@ -19,8 +19,8 @@ app = Flask(__name__)
 # server_session = Session(app)
 app.config["SECRET_KEY"] = b'6hc/_gsh,./;2ZZx3c6_s,1//'
 #app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=2)
-app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(seconds=480)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=30000)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(seconds=48000000)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 cors = CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
@@ -113,10 +113,12 @@ def getRoom():
     return Presenter.getRoom()
 
 @app.route("/api/getTrainImgs",methods= ['POST'])
+@jwt_required()
 def uploadImg():
     return Presenter.getImgs()
 
 @app.route("/api/verification",methods=['POST'])
+@jwt_required()
 def verify():
     return Presenter.verify()
 if __name__ == "__main__":
