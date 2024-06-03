@@ -268,6 +268,3 @@ class MongoAPI():
 #             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
 #             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
    
-
-
-

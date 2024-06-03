@@ -72,7 +72,3 @@ class AdaAPI:
       except KeyboardInterrupt:
         self.client.disconnect()
         sys.exit(1)
-
-
-
-

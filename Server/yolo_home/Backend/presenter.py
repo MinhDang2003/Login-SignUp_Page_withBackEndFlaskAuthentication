@@ -9,7 +9,9 @@ from datetime import date,datetime,time,timedelta
 from statistics import mean 
 import uuid
 import re
-    
+import numpy as np
+import cv2
+
 class Presenter:
     def __init__(self) -> None:
         pass
@@ -97,8 +99,8 @@ class Presenter:
         email = get_jwt_identity()
         found = MongoAPI.getUserInfo(email)
         response_body = {
-            "name": found["name"],
-            "about" :"Hello! I'm a full stack developer that loves python and javascript"
+            "name": found["name"]
+            #"about" :"Hello! I'm a full stack developer that loves python and javascript"
         }
         return jsonify({"msg":"Successful get user info","user": response_body}), 200
     
@@ -386,3 +388,33 @@ class Presenter:
             return jsonify(({"msg": f"Successful get room: {room_id}",'rooms': dict(result)})) , 200
         else :
             return jsonify({"msg": f"room_id: {room_id} doesnt exist"}) , 400
+        
+    @classmethod
+    def getImgs(cls):
+        if 'img_arr' not in request.json:
+            return jsonify({"msg": "Invalid getImgs request - missing img_arr field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid getImgs request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Upload Successfully"}) , 200
+    
+    @classmethod
+    def getImgs(cls):
+        if 'img_arr' not in request.json:
+            return jsonify({"msg": "Invalid uploadImg request - missing img_arr field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid uploadImg request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Upload Successfully"}) , 200
+    
+    @classmethod
+    def verify(cls):
+        if 'input_img' not in request.json:
+            return jsonify({"msg": "Invalid verify request - missing input_img field"}) , 400
+        if 'name' not in request.json:
+            return jsonify({"msg": "Invalid verify request - missing name field"}) , 400
+        name = request.json.get('name',None)
+        img_arr = request.json.get('img_arr',None)
+        return jsonify({"msg": "Successfully" , "verified": 1}) , 200
