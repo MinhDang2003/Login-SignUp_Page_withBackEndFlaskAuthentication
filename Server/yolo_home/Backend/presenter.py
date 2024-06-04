@@ -292,6 +292,8 @@ class Presenter:
         app_id = request.json.get("appliance_id",None)
         app_type = request.json.get("appliance_type",None)
         feed_id = request.json.get("feed_id",None)
+        if feed_id not in Presenter.getFeedList():
+            return jsonify({"msg": f"feed_id: {feed_id} doesn't exist"}) , 400
         result = MongoAPI.addAppliance(room_id=room_id,app_id=app_id,app_type=app_type,feed_id=feed_id)
         if type(result) is str:
             return jsonify({"msg": result}) , 400
@@ -504,3 +506,7 @@ class Presenter:
             return jsonify({"msg": "Successfully" , "verified": 'false'}) , 200
             
         return jsonify({"msg": "Successfully" , "verified": 'true'}) , 200
+    
+    @classmethod
+    def getFeedList(cls):
+        return AdaAPI().getFeedlst()

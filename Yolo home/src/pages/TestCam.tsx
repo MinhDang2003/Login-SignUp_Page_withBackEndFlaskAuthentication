@@ -12,6 +12,7 @@ const WebcamCapture = () => {
   const webcamRef = useRef<Webcam>(null);
   const [countUp, setCountUp] = useState(0);
   const [capturing, setCapturing] = useState(false);
+  const [uploading,setUploading] = useState(false)
   const [isSuccess,setIsSuccess] = useState(false)
   const [verifying, setVerifying ] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -61,7 +62,7 @@ const WebcamCapture = () => {
     setTimeout(async() => {
       clearInterval(intervalId);
       setCapturing(false);
-    
+      setUploading(true)
       try {
         await sendRequest();
         setIsSuccess(true)
@@ -69,7 +70,7 @@ const WebcamCapture = () => {
         console.error("Axios request failed after 2 attempts", error);
         setIsSuccess(false)
       }
-    
+      setUploading(false)
       
       
       console.log("I'm done now");
@@ -176,8 +177,9 @@ const WebcamCapture = () => {
                         </div>
                     </div>
                     <div className="mt-5 flex-col justify-center items-center">
-                        <button onClick={startCapture} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={capturing}>
+                        <button onClick={startCapture} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={capturing || uploading}>
                           {capturing ? 'Capturing...' : 'Capture photos'}
+                          {uploading ? 'Uploading...' : ''}
                         </button>
                         
                     </div>

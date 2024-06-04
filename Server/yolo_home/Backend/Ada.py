@@ -29,7 +29,10 @@ class AdaAPI:
       except Exception as e:
         print('Unable to connect to MQTT server {}{}'.format(type(e).__name__,e))
         sys.exit()
-      
+    
+    def getFeedlst(self):
+      return AdaAPI._FEED_ID_List
+    
     def _connected(client):
       print("Connected to AdaFruit successfully")
       for feed_id in AdaAPI._FEED_ID_List:
