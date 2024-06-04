@@ -4,7 +4,7 @@ import sys
 import time
 
 from Model.MongoSetup import *
-ADAFRUIT_IO_KEY = 'aio_ieox89ZafTBlkpcICZFkmfANhCaW'
+ADAFRUIT_IO_KEY = 'aio_tKpk32j1XBMtcrOmMP6DGmBJ8Qee'
 ADAFRUIT_IO_USERNAME = 'grassni'
 ADAFRUIT_IO_URL = 'io.adafruit.com'
 

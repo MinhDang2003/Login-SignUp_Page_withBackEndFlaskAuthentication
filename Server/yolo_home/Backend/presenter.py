@@ -184,13 +184,20 @@ class Presenter:
                 return [{'value': [], 'hour': _date + timedelta(hours=hour)} for hour in range(0,24)]
             if length == 24:
                 return arr
-            
+            #print(arr)
+            print(len(arr))
             returnAr = []
             for i in range(48):
-                if arr[-(i+1)]['value'] == [] or arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
+                if  arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
                     continue
-                returnAr = arr[:-(i)]
+                if arr[-(i+1)]['value'] == []: 
+                    continue
+                print("HERE")
+                print(i)
+                returnAr = arr[:48-(i)]
                 break
+            
+            print(returnAr)
             if len(returnAr) >= 24:
                 return returnAr[-24:]
             if len(returnAr) == 0:
@@ -428,7 +435,7 @@ class Presenter:
             # image = Image.open(image_buf)
             # image.show()
             try:  
-                embedding = DeepFace.represent(img_path = img_arr[i], model_name = "Facenet", normalization='Facenet', align=False , enforce_detection= False)[0]["embedding"]
+                embedding = DeepFace.represent(img_path = img_arr[i], model_name = "Facenet", normalization='Facenet', align=False , enforce_detection= True)[0]["embedding"]
             except Exception as e:
                 facial_img_path = img_arr[i]  
                 #print(img_arr[i] )
@@ -444,6 +451,7 @@ class Presenter:
                 #print(f"error here")
                 #print("here")
                 #return jsonify({"msg": str(e)}) , 400
+                return jsonify({"msg": "Could not detect face"}) , 400
                 
             instances.append(embedding)
             if embedding_vector is None:
@@ -475,7 +483,18 @@ class Presenter:
         else: 
             return jsonify({"msg": "No image was sent back"}) , 400
         try:  
-            embedding = DeepFace.represent(img_path = img_arr, model_name = "Facenet")[0]["embedding"]
+            embedding = DeepFace.represent(img_path = img_arr, model_name = "Facenet",enforce_detection=False)[0]["embedding"]
+            facial_img_path = img_arr 
+                #print(img_arr[i] )
+            facial_img_path = facial_img_path.split(",")[1]
+
+                #facial_img_path += "=" * ((4 - len(facial_img_path) % 4) % 4)
+            image_bytes = base64.b64decode(facial_img_path)
+            image_buf = io.BytesIO(image_bytes)
+            image = Image.open(image_buf)
+            image_rgb = image.convert('RGB')
+
+            image_rgb.save('output_image.jpeg')
         except Exception as e:
             facial_img_path = img_arr 
                 #print(img_arr[i] )
