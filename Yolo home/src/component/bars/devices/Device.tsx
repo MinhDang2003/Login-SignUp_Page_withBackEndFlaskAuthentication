@@ -26,7 +26,6 @@ function Device(data){
       }
     }
     
-    console.log(isOn,333)
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 

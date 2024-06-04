@@ -1,5 +1,9 @@
 import {Link } from "react-router-dom";
 import Users from "../component/Users";
+import 'regenerator-runtime/runtime';
+import SpeechRecognition, {
+    useSpeechRecognition,
+  } from "react-speech-recognition";
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from 'react'
 import Sidebarr from "../component/Sidebar";
@@ -80,6 +84,51 @@ const styles = {
 };
 
 function Dashboard() {
+    const commands = [
+        {
+          command: "add device * in *",
+          callback: (deviceInfo, roomID) => {
+            const [deviceType, deviceID] = deviceInfo.split(" ");
+            setInputs({ roomID, deviceID, deviceType });
+            handleSubmit({ target: { name: "addDevice" }, preventDefault: () => {} });
+          },
+        },
+        {
+          command: "remove device * in *",
+          callback: (deviceInfo, roomID) => {
+            const [deviceType, deviceID] = deviceInfo.split(" ");
+            setInputs({ roomID, deviceID, deviceType });
+            handleSubmit({ target: { name: "removeDevice" }, preventDefault: () => {} });
+          },
+        },
+        {
+          command: "add room *",
+          callback: (roomID) => {
+            setInputs({ ...inputs, roomID });
+            handleSubmit({ target: { name: "addRoom" }, preventDefault: () => {} });
+          },
+        },
+        {
+          command: "remove room *",
+          callback: (roomID) => {
+            setInputs({ ...inputs, roomID });
+            handleSubmit({ target: { name: "removeRoom" }, preventDefault: () => {} });
+          },
+        },
+        {
+          command: "toggle device * in *",
+          callback: (deviceInfo, roomID) => {
+            const [deviceType, deviceID] = deviceInfo.split(" ");
+            toggleFunction([roomID, deviceID, 0, deviceType]);
+          },
+        },
+      ];
+    
+      const { transcript, resetTranscript } = useSpeechRecognition({ commands });
+    
+      if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+        return <div>Your browser does not support speech recognition software! Try Chrome desktop, maybe?</div>;
+      }
 	const [inputs, setInputs] = useState({});
 
 	const handleChange = (event) => {
@@ -87,16 +136,16 @@ function Dashboard() {
 	  const value = event.target.value;
 	  setInputs(values => ({...values, [name]: value}))
 	}
+    const [isListening, setIsListening] = useState(false);
+
 	const [triggerRender, setTriggerRender] = useState(false);
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, close: () => void) =>{
 	  event.preventDefault();
-	  console.log(inputs);
-	  console.log(event.target.name)
+
 	  if (event.target.name == "addRoom"){
 		try {
 			const res = await RoomsApi.addRoom(inputs.roomID);
-            console.log(res,3122)
-			console.log('Room added:', inputs.roomID);
+
 			setTriggerRender(!triggerRender);
 			close();
 		} catch (error) {
@@ -108,7 +157,6 @@ function Dashboard() {
 	  else if (event.target.name == "removeRoom"){
 		try {
 			await RoomsApi.removeRoom(inputs.roomID);
-			console.log('Room removed:', inputs.roomID);
 			setTriggerRender(!triggerRender);
 			close();
 		} catch (error) {
@@ -119,7 +167,6 @@ function Dashboard() {
 	  else if (event.target.name == "addDevice"){
 		try {
 			await DeviceApi.addDevice(inputs.roomID,inputs.deviceID,inputs.deviceType);
-			console.log('Device added:', inputs.roomID, inputs.deviceID,inputs.deviceType);
 			setTriggerRender(!triggerRender);
 			close();
 		} catch (error) {
@@ -130,7 +177,6 @@ function Dashboard() {
 	  else if (event.target.name == "removeDevice"){
 		try {
 			const res =  await DeviceApi.removeDevice(inputs.roomID,inputs.deviceID);
-			console.log('Device removed:', inputs.roomID, inputs.deviceID);
 			setTriggerRender(!triggerRender);
 			close();
 		} catch (error) {
@@ -153,10 +199,8 @@ function Dashboard() {
       const getData = async () => {
         const res = await getAllRoomsData()
         setData(res)
-        console.log(res,66666)
         if (selectedRoom=="{:::}" || !res.some((item) => item.room_id === selectedRoom)){
         setSelectedRoom(res[0].room_id)
-        console.log(333999)
         }
       }
       getData()
@@ -164,14 +208,20 @@ function Dashboard() {
     )
     useEffect(()=> {
       const getData = async () => {
-		console.log(selectedRoom,444)
         const res = await getDevicesOfRoom(selectedRoom)
-		console.log(res,3575)
         if (selectedRoom != "0") setDevicesData(res);
       }
       getData()
     },[selectedRoom,count])
-  
+    const handleMicClick = () => {
+        if (isListening) {
+            SpeechRecognition.stopListening();
+            resetTranscript();
+        } else {
+            SpeechRecognition.startListening();
+        }
+        setIsListening(!isListening);
+    };
     useEffect(() => {
       const toggle = async ()=>{
         const res = await toggleDevice(toggleData[0],toggleData[1],toggleData[2],toggleData[3])
@@ -200,6 +250,12 @@ function Dashboard() {
 			</div>
 			<div className=" grow body w-screen h-screen ">
 				<h1 className="text-black font-serif text-center text-7xl">Dashboard</h1>
+                <button onClick={handleMicClick} >
+                    <span >
+                        Voice Assistance
+                    </span>
+                </button>
+                <p >Transcript: {transcript}</p>
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<h1>Add Room</h1>

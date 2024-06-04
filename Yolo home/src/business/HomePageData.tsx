@@ -4,10 +4,7 @@ import RoomsAPI from"../api_copy/RoomsApi";
 
 async function getAllRoomsData(){
     const data = await RoomsAPI.getAllRooms()
-    console.log(data.data.rooms)
     let res =  data.data.rooms.map((item)=>({"devices":item.appliances, "room_id":item.room_id}))
-    console.log(res)
-    console.log(22)
     let result = []
     for (var i in res)
         result.push(res[i])
@@ -35,7 +32,6 @@ async function processSignalData(data){
 
 async function getDevicesOfRoom(room_id) {
     const data = await RoomsAPI.getDevicesByRoomID(room_id)
-    console.log(data,8998)
     let devices = {devices:[],signal:[]}
     for (var i in data.data.rooms.appliances) {
         const device = data.data.rooms.appliances[i] 
