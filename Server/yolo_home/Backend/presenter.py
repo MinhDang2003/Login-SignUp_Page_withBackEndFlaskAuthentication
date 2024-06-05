@@ -136,6 +136,7 @@ class Presenter:
                 #return jsonify({f"{help_dict[choice]}": current_log}) , 200
                 return jsonify({f"value": current_log}) , 200
             #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
+            print(current_log)
             try:
                 return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
             except:
@@ -421,13 +422,13 @@ class Presenter:
         # image_rgb = image.convert('RGB')
 
         # image_rgb.save('output_image.jpeg')
-
+        print("HEELLLLL")
         instances = []
         embedding_vector = None
         for i in tqdm(range(0, len(img_arr))):
             # facial_img_path = img_arr[i]  
             # #print(img_arr[i] )
-            # facial_img_path = facial_img_path.split(",")[1]
+            # facial_img_path = faciasssl_img_path.split(",")[1]
 
             # #facial_img_path += "=" * ((4 - len(facial_img_path) % 4) % 4)
             # image_bytes = base64.b64decode(facial_img_path)
@@ -517,13 +518,14 @@ class Presenter:
         for em in found['embeddings']:
             dist = np.linalg.norm(np.array(embedding)-np.array(em))
             print(dist)
-            if dist > 10:
+            if dist >= 10:
                 continue
             count += 1
         print(count)
-        if count * 1.0 / length < 0.7:
-            return jsonify({"msg": "Successfully" , "verified": 'false'}) , 200
-            
+        if count * 1.0 / length < 0.5:
+            AdaAPI().publishData(0,'face')
+            return jsonify({"msg": "Successfully" , "verified": 'false'}) , 400
+        AdaAPI().publishData(1,'face')
         return jsonify({"msg": "Successfully" , "verified": 'true'}) , 200
     
     @classmethod

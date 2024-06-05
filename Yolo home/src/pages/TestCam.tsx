@@ -112,7 +112,7 @@ const WebcamCapture = () => {
           const axiosError = error as AxiosError;
           if (axiosError.response?.status === 400) {setErrorMessage(axiosError.response?.data?.msg);}
           console.error(axiosError);
-          if (attempt < 1) { // Retry once
+          if (attempt < 0) { // Retry once
             return sendRequest(attempt + 1);
           } else {
             
@@ -130,11 +130,11 @@ const WebcamCapture = () => {
         
         const ver = res?.data?.verified
         console.log(ver)
-        setVerified(ver)
+        setVerified(true)
         
       } catch(error) {
         console.error("Axios2222 request failed after 2 attempts", error);
-        
+        setVerified(false)
       }
       setWaitVerify(false)
     } , 1100
@@ -165,7 +165,7 @@ const WebcamCapture = () => {
                     <h1 className="text-black font-serif text-center text-7xl">Face Recognition Setup</h1>
                     <div className="mt-5 flex justify-center items-center ">
                         <div className="overflow-hidden p-3 bg-[#DAC0A3]" style={{ width: "70%", height: "auto" }}>
-                            <Webcam ref={webcamRef} mirrored={false} screenshotFormat="image/jpeg" />
+                            <Webcam ref={webcamRef} mirrored={true} screenshotFormat="image/jpeg" />
                         </div>
                     </div>
                     <div className="mt-5 flex justify-center items-center w-full">
@@ -191,7 +191,7 @@ const WebcamCapture = () => {
                         {/* {errorMessage && <p className='text-base pl-1 pb-4 text-red-600 font-sans'>{errorMessage}</p>} */}
                     </div>
                     <div className="mt-5 flex justify-center items-center">
-                        <p>{countUp == 1 ? verifying == false ? verified == true ? 'Face match' : waitVerify == true ? 'Verifying' : 'Face not match' : '' : ''}</p>
+                        <p>{countUp == 1 ? verifying == false ? verified == true ? 'Face match' : waitVerify == true ? 'Verifying' : 'Face not match' : '' : ''}  </p>
                     </div>
 
                 </div>
