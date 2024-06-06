@@ -155,6 +155,7 @@ class Presenter:
             start = datetime.combine(datetime.today(), time.min) - timedelta(days=1)
             end = datetime.combine(datetime.today(), time.min)
             returnAr = Presenter._get_log_option(help_dict[choice],0,start,end)
+            #print(returnAr)
             returnAr = list(map(lambda x : {'value': mean(x['value']),'hour': x['hour'].strftime("%H:%M %d/%m")} if x['value'] != [] else {'value': 0,'hour': x['hour'].strftime("%H:%M %d/%m")},returnAr ))
             
             return jsonify({f"{help_dict[choice]}": returnAr}) , 200
@@ -178,6 +179,7 @@ class Presenter:
             arr = []
             for i in res:
                 arr =   arr + i[field]  
+            
             length = len(arr)
             if length == 0:
                 _date = enddate
@@ -187,7 +189,7 @@ class Presenter:
             
             returnAr = []
             for i in range(48):
-                if arr[-(i+1)]['value'] == [] and arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
+                if arr[-(i+1)]['value'] == [] or arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
                     continue
                 returnAr = arr[:-(i)]
                 break
@@ -208,7 +210,7 @@ class Presenter:
             while i['date'] != _date:    
                 arr = arr + [{'value': 0 ,'date': _date.strftime("%d/%m")}]
                 _date = _date + timedelta(days = 1)
-            
+            #print(_date)
             value = Presenter.processLst(i[field])
             arr = arr + [{'value': value ,'date': _date.strftime("%d/%m")}]
             _date = _date + timedelta(days = 1)
@@ -389,13 +391,21 @@ class Presenter:
         
     @classmethod
     def getImgs(cls):
+        
         if 'img_arr' not in request.json:
             return jsonify({"msg": "Invalid getImgs request - missing img_arr field"}) , 400
         # if 'name' not in request.json:
         #     return jsonify({"msg": "Invalid getImgs request - missing name field"}) , 400
         # name = request.json.get('name',None)
-        img_arr = request.json.get('img_arr',None)[:10]
-        print(len(img_arr))
+        
+        img_arr = request.json.get('img_arr',None)
+        if (len(img_arr) == 0): 
+            return jsonify({'msg': "No image was sent back - Upload failed"}) , 400
+        if (len(img_arr) < 10):
+            return jsonify({'msg': "Not enough images sent back"}) , 400
+        
+        img_arr = img_arr[:10]
+        # print(len(img_arr))
         # facial_img_path = img_arr[0]  
         # facial_img_path = facial_img_path.split(",")[1]
         # image_bytes = base64.b64decode(facial_img_path)
@@ -418,9 +428,22 @@ class Presenter:
             # image = Image.open(image_buf)
             # image.show()
             try:  
-                embedding = DeepFace.represent(img_path = img_arr[i], model_name = "Facenet")[0]["embedding"]
+                embedding = DeepFace.represent(img_path = img_arr[i], model_name = "Facenet", normalization='Facenet', align=False , enforce_detection= False)[0]["embedding"]
             except Exception as e:
-                return jsonify({"msg": str(e)}) , 400
+                facial_img_path = img_arr[i]  
+                #print(img_arr[i] )
+                facial_img_path = facial_img_path.split(",")[1]
+
+                #facial_img_path += "=" * ((4 - len(facial_img_path) % 4) % 4)
+                image_bytes = base64.b64decode(facial_img_path)
+                image_buf = io.BytesIO(image_bytes)
+                image = Image.open(image_buf)
+                image_rgb = image.convert('RGB')
+
+                image_rgb.save('output_image.jpeg')
+                #print(f"error here")
+                #print("here")
+                #return jsonify({"msg": str(e)}) , 400
                 
             instances.append(embedding)
             if embedding_vector is None:
@@ -454,6 +477,17 @@ class Presenter:
         try:  
             embedding = DeepFace.represent(img_path = img_arr, model_name = "Facenet")[0]["embedding"]
         except Exception as e:
+            facial_img_path = img_arr 
+                #print(img_arr[i] )
+            facial_img_path = facial_img_path.split(",")[1]
+
+                #facial_img_path += "=" * ((4 - len(facial_img_path) % 4) % 4)
+            image_bytes = base64.b64decode(facial_img_path)
+            image_buf = io.BytesIO(image_bytes)
+            image = Image.open(image_buf)
+            image_rgb = image.convert('RGB')
+
+            image_rgb.save('output_image.jpeg')
             return jsonify({"msg": str(e)}) , 400
         found = dict(MongoAPI.getEmbedding(get_jwt_identity()))
         if 'embeddings' not in found.keys():

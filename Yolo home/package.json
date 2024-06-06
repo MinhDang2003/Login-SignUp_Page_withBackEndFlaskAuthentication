@@ -11,20 +11,29 @@
   },
   "dependencies": {
     "@mui/icons-material": "^5.15.18",
-    "@mui/material": "^5.15.18",
+    "@mui/material": "^5.15.19",
     "axios": "^1.6.8",
+<<<<<<< HEAD
     "chart.js": "^4.4.3",
     "faker": "^6.6.6",
+=======
+    "chart.js": "^4.4.2",
+    "faker": "^5.5.3",
+>>>>>>> Minh
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.51.3",
     "react-pro-sidebar": "^0.7.1",
     "react-router-dom": "6.4",
+<<<<<<< HEAD
     "react-speech-recognition": "^3.10.0",
     "react-webcam": "^7.2.0",
     "reactjs-popup": "^2.0.6",
     "regenerator-runtime": "^0.14.1",
+=======
+    "react-webcam": "^7.2.0",
+>>>>>>> Minh
     "styled-components": "^6.1.11"
   },
   "devDependencies": {

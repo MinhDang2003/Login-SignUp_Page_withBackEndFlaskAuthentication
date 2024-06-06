@@ -1,4 +1,4 @@
-from flask import Flask , jsonify, request
+from flask import Flask , jsonify, request , make_response
 
 from flask_jwt_extended import jwt_required , JWTManager
 
@@ -29,6 +29,13 @@ cors = CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, suppor
 app.config["JWT_SECRET_KEY"] = b"6hc/_gsh,./;2ZZx3c6_s,1//"
 
 jwt = JWTManager(app)
+
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add("Access-Control-Allow-Headers", "*")
+    response.headers.add("Access-Control-Allow-Methods", "*")
+    return response
 
 @app.route('/users/refresh',methods=['GET'])
 @jwt_required(optional=True,verify_type=True)
@@ -115,6 +122,12 @@ def getRoom():
 @app.route("/api/getTrainImgs",methods= ['POST'])
 @jwt_required()
 def uploadImg():
+    if request.method == 'OPTIONS':
+        print("Fake")
+        # This is the preflight request. 
+        # You can do your custom handling here. 
+        return _build_cors_preflight_response()
+    print("Real")
     return Presenter.getImgs()
 
 @app.route("/api/verification",methods=['POST'])
