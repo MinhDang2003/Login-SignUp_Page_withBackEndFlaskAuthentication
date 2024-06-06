@@ -85,20 +85,6 @@ const styles = {
 };
 
 function Dashboard() {
-<<<<<<< Updated upstream
-	return (
-		<div className="w-screen h-screen  items-start">
-			<aside className="w-screen">
-				<Sidebar />
-			</aside>
-			<section className="flex-grow p-6">
-				<h1>Dashboard</h1>
-				<br />
-				<Users />
-				<br />
-				<div className="flex">
-					<Link to="/">Home</Link>
-=======
     const commands = [
         {
           command: "add device * in *",
@@ -462,7 +448,6 @@ function Dashboard() {
 						<DevicesBar data={[devicesData.devices,setToggleData]}></DevicesBar>
 						
 					</div>
->>>>>>> Stashed changes
 				</div>
 			</div>
 		</div>
