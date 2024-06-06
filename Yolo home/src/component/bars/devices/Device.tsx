@@ -4,26 +4,45 @@ import { tokens } from "../../../theme.tsx";
 import StatBox from "../../StatBox"
 import TripleToggleSwitch from "../../triple";
 import ReactDOM from "react-dom";
+import fan_image from "../../../assets/dashboard/fan.png"
+import light_image from "../../../assets/dashboard/idea.png"
 
 function Device(data){
     const room = data.data[0][1]
     const devices = data.data[0][0]
-    
-    const toggleFunction = data.data[1]
-    var isOn
-    if (devices.app_type=="fan"){
-        isOn = Number(devices.value)/50
+    let deviceImage;
+    if (devices.app_type === "fan") {
+        deviceImage = fan_image;
+    } else if (devices.app_type === "light") {
+        deviceImage = light_image;
     }
-    else if (devices.app_type=="light"){
-      if (devices.value == "#000000"){
-        isOn = 0
-      }
-      else if (devices.value == "#ffffff"){
-        isOn = 1
-      }
-      else{
-        isOn = 2
-      }
+    console.log(devices)
+    const toggleFunction = data.data[1]
+    let isOn;
+    let subtitle;
+    if (devices.app_type === "fan") {
+
+        if (devices.value === 0) {
+            isOn = 0;
+            subtitle = "Off";
+        } else if (devices.value === 50) {
+            isOn = 1;
+            subtitle = "Half";
+        } else {
+            isOn = 2;
+            subtitle = "Full";
+        }
+    } else if (devices.app_type === "light") {
+        if (devices.value === "#000000") {
+            isOn = 0;
+            subtitle = "Off";
+        } else if (devices.value === "#ffffff") {
+            isOn = 1;
+            subtitle = "White";
+        } else {
+            isOn = 2;
+            subtitle = "Yellow";
+        }
     }
     
     const theme = useTheme();
@@ -36,7 +55,7 @@ function Device(data){
         <>
         <Box
         sx={{ width:'200px',borderRadius:'15%', margin: '15px 10px 15px 10px' }}
-        backgroundColor={isOn? colors.primary[300]:colors.primary[900]}
+        backgroundColor={isOn? colors.greenAccent[300]:colors.primary[900]}
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -45,6 +64,7 @@ function Device(data){
       >
         <div>
                         <input className="form-check-input" type="checkbox" role="switch" checked={isOn==0} id={devices.app_id+"0"}
+                        
                 onChange={(e) => {
                     toggleFunction([room,devices.app_id,0,devices.app_type])
                 }}
@@ -62,13 +82,11 @@ function Device(data){
         </div>
                 
         <StatBox
-          title={devices.app_id}
-          subtitle={isOn!=0? "On":"Off"}
-          status = {isOn}
-          icon=
-            {devices.icon}
-          
-        />
+                    title={devices.app_id}
+                    subtitle={subtitle}
+                    status={isOn}
+                    icon={<img src={deviceImage} alt={devices.app_type} style={{ width: '50px', height: '50px' }} />}
+                />
       </Box>
         </>
     )

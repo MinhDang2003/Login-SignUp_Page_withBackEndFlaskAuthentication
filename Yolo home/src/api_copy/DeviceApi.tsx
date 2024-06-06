@@ -24,8 +24,8 @@ async function setStateDevice(roomID,devide_id,light_color,type){
         return false
     }
 }
-async function addDevice(roomID,devide_id,device_type){
-    const res = await axiosPublic.post("/api/new_app",{appliance_id: devide_id, room_id: roomID,appliance_type: device_type});
+async function addDevice(roomID,devide_id,device_type,feedID){
+    const res = await axiosPublic.post("/api/new_app",{appliance_id: devide_id, room_id: roomID,appliance_type: device_type,feed_id: feedID});
     return res
 }
 async function removeDevice(roomID: any,deviceID: any){

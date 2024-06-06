@@ -20,7 +20,7 @@ function RoomBar(data:any){
         justifyContent="start"
         gridColumn="span 12"
         gridRow="span 1"
-        style={{backgroundColor:colors.primary[400]}}
+        
         >
         {
                 rooms.slice(0,viewAll?rooms.length:numDisplay).map((item)=> (

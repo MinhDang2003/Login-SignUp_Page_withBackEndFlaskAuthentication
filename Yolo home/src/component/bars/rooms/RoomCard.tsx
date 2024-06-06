@@ -13,7 +13,7 @@ function RoomCard(data) {
     return (
         
         <Box
-        sx={{ flex: '1 0 auto', margin: '20px 20px 20px 20px' }}
+        sx={{ width:'300px',height:'300px',borderRadius:'15%', margin: '15px 10px 15px 10px' }}
         onClick={(e)=>{
   e.preventDefault()
   setSelected(room.room_id)}}

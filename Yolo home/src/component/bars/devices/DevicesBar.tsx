@@ -15,7 +15,7 @@ function DevicesBar(data) {
           justifyContent="start"
                     gridColumn="span 12"
                     gridRow="span 1"
-                    backgroundColor={colors.primary[400]}
+                    
         >
         {
             devices.map((item)=> <Device data={[item,toggleFunction]}></Device>)
