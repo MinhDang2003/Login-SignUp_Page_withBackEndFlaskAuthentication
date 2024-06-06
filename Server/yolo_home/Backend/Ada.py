@@ -4,7 +4,7 @@ import sys
 import time
 
 from Model.MongoSetup import *
-ADAFRUIT_IO_KEY = 'aio_ieox89ZafTBlkpcICZFkmfANhCaW'
+ADAFRUIT_IO_KEY = 'aio_WDNF53ZXOJSywG3cSYtD1H4vCy7E'
 ADAFRUIT_IO_USERNAME = 'grassni'
 ADAFRUIT_IO_URL = 'io.adafruit.com'
 
@@ -29,7 +29,10 @@ class AdaAPI:
       except Exception as e:
         print('Unable to connect to MQTT server {}{}'.format(type(e).__name__,e))
         sys.exit()
-      
+    
+    def getFeedlst(self):
+      return AdaAPI._FEED_ID_List
+    
     def _connected(client):
       print("Connected to AdaFruit successfully")
       for feed_id in AdaAPI._FEED_ID_List:

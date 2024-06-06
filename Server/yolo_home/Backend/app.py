@@ -119,6 +119,10 @@ def getAllRoom():
 def getRoom():
     return Presenter.getRoom()
 
+@app.route("/api/getFeedList",methods= ['POST'])
+def getFeedList():
+    return Presenter.getFeedList()
+
 @app.route("/api/getTrainImgs",methods= ['POST'])
 @jwt_required()
 def uploadImg():

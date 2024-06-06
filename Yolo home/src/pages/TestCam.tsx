@@ -12,6 +12,7 @@ const WebcamCapture = () => {
   const webcamRef = useRef<Webcam>(null);
   const [countUp, setCountUp] = useState(0);
   const [capturing, setCapturing] = useState(false);
+  const [uploading,setUploading] = useState(false)
   const [isSuccess,setIsSuccess] = useState(false)
   const [verifying, setVerifying ] = useState(false);
   const [images, setImages] = useState<string[]>([]);
@@ -61,7 +62,7 @@ const WebcamCapture = () => {
     setTimeout(async() => {
       clearInterval(intervalId);
       setCapturing(false);
-    
+      setUploading(true)
       try {
         await sendRequest();
         setIsSuccess(true)
@@ -69,7 +70,7 @@ const WebcamCapture = () => {
         console.error("Axios request failed after 2 attempts", error);
         setIsSuccess(false)
       }
-    
+      setUploading(false)
       
       
       console.log("I'm done now");
@@ -111,7 +112,7 @@ const WebcamCapture = () => {
           const axiosError = error as AxiosError;
           if (axiosError.response?.status === 400) {setErrorMessage(axiosError.response?.data?.msg);}
           console.error(axiosError);
-          if (attempt < 1) { // Retry once
+          if (attempt < 0) { // Retry once
             return sendRequest(attempt + 1);
           } else {
             
@@ -123,22 +124,19 @@ const WebcamCapture = () => {
     setTimeout(async() => {
       clearInterval(intervalId);
       setVerifying(false);
-    
+      setWaitVerify(true)
       try {
         const res = await sendRequest();
-        setWaitVerify(true)
+        
         const ver = res?.data?.verified
         console.log(ver)
-        if (ver) {
-          setVerified(true)
-        }
-        else {
-          setVerified(false)
-        }
+        setVerified(true)
+        
       } catch(error) {
         console.error("Axios2222 request failed after 2 attempts", error);
-        setWaitVerify(false)
+        setVerified(false)
       }
+      setWaitVerify(false)
     } , 1100
     )
       console.log("I'm done now2");
@@ -167,7 +165,7 @@ const WebcamCapture = () => {
                     <h1 className="text-black font-serif text-center text-7xl">Face Recognition Setup</h1>
                     <div className="mt-5 flex justify-center items-center ">
                         <div className="overflow-hidden p-3 bg-[#DAC0A3]" style={{ width: "70%", height: "auto" }}>
-                            <Webcam ref={webcamRef} mirrored={false} screenshotFormat="image/jpeg" />
+                            <Webcam ref={webcamRef} mirrored={true} screenshotFormat="image/jpeg" />
                         </div>
                     </div>
                     <div className="mt-5 flex justify-center items-center w-full">
@@ -176,23 +174,24 @@ const WebcamCapture = () => {
                         </div>
                     </div>
                     <div className="mt-5 flex-col justify-center items-center">
-                        <button onClick={startCapture} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={capturing}>
-                          {capturing ? 'Capturing...' : 'Capture photos'}
+                        <button onClick={startCapture} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={capturing == true || uploading == true}>
+                          {capturing == true ? 'Capturing...' : uploading == true ? 'Uploading...' : 'Capture face images'}
+                          
                         </button>
                         
                     </div>
                     <div className="mt-5 flex justify-center items-center">
-                        <p>{countUp == 12 ? !capturing ? isSuccess ? 'Successfully added face id' : 'Please try again' : '' : ''}</p>
+                        <p>{countUp == 12 ? !capturing ? isSuccess ? 'Successfully added face id' : uploading ? '' : 'Please try again' : '' : ''}</p>
                     </div>
 
                     <div className="mt-5 flex-col justify-center items-center">
-                        <button onClick={verify} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={verifying}>
-                          {verifying ? 'Verifying...' : 'Verify face'}
+                        <button onClick={verify} className="bg-[#DAC0A3] text-black py-2 px-4 rounded ${capturing ? 'opacity-50 cursor-not-allowed' : ''}" disabled={verifying == true || waitVerify == true}>
+                          {verifying == true ? 'Uploading face images...' : waitVerify == true ? 'Verifying' : 'Verify face'}
                         </button>
-                        {errorMessage && <p className='text-base pl-1 pb-4 text-red-600 font-sans'>{errorMessage}</p>}
+                        {/* {errorMessage && <p className='text-base pl-1 pb-4 text-red-600 font-sans'>{errorMessage}</p>} */}
                     </div>
                     <div className="mt-5 flex justify-center items-center">
-                        <p>{countUp == 1 ? !verifying ? waitVerify ? verified ? 'Face matched' : 'Face not match' : '' : '' : ''}</p>
+                        <p>{countUp == 1 ? verifying == false ? verified == true ? 'Face match' : waitVerify == true ? 'Verifying' : 'Face not match' : '' : ''}  </p>
                     </div>
 
                 </div>

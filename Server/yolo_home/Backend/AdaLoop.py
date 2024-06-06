@@ -1,4 +1,4 @@
 from Ada import AdaAPI
 
 
-AdaAPI().setUpAda()
+AdaAPI().publishData('#c4e024','led1')

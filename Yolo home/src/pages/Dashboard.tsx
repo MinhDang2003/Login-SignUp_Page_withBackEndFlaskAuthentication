@@ -1,9 +1,7 @@
 import {Link } from "react-router-dom";
 import Users from "../component/Users";
 import 'regenerator-runtime/runtime';
-import SpeechRecognition, {
-    useSpeechRecognition,
-  } from "react-speech-recognition";
+
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from 'react'
 import Sidebarr from "../component/Sidebar";
@@ -15,7 +13,6 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import RoomsApi from '../api_copy/RoomsApi'
 import DeviceApi from '../api_copy/DeviceApi'
-import mic_icon from '../assets/dashboard/microphone.png'
 const styles = {
     modal: {
         position: 'relative' as 'relative',
@@ -85,51 +82,7 @@ const styles = {
 };
 
 function Dashboard() {
-    const commands = [
-        {
-          command: "add device * in *",
-          callback: (deviceInfo, roomID) => {
-            const [deviceType, deviceID] = deviceInfo.split(" ");
-            setInputs({ roomID, deviceID, deviceType });
-            handleSubmit({ target: { name: "addDevice" }, preventDefault: () => {} });
-          },
-        },
-        {
-          command: "remove device * in *",
-          callback: (deviceInfo, roomID) => {
-            const [deviceType, deviceID] = deviceInfo.split(" ");
-            setInputs({ roomID, deviceID, deviceType });
-            handleSubmit({ target: { name: "removeDevice" }, preventDefault: () => {} });
-          },
-        },
-        {
-          command: "add room *",
-          callback: (roomID) => {
-            setInputs({ ...inputs, roomID });
-            handleSubmit({ target: { name: "addRoom" }, preventDefault: () => {} });
-          },
-        },
-        {
-          command: "remove room *",
-          callback: (roomID) => {
-            setInputs({ ...inputs, roomID });
-            handleSubmit({ target: { name: "removeRoom" }, preventDefault: () => {} });
-          },
-        },
-        {
-          command: "toggle device * in *",
-          callback: (deviceInfo, roomID) => {
-            const [deviceType, deviceID] = deviceInfo.split(" ");
-            toggleFunction([roomID, deviceID, 0, deviceType]);
-          },
-        },
-      ];
     
-      const { transcript, resetTranscript } = useSpeechRecognition({ commands });
-    
-      if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-        return <div>Your browser does not support speech recognition software! Try Chrome desktop, maybe?</div>;
-      }
 	const [inputs, setInputs] = useState({});
 
 	const handleChange = (event) => {
@@ -137,7 +90,6 @@ function Dashboard() {
 	  const value = event.target.value;
 	  setInputs(values => ({...values, [name]: value}))
 	}
-    const [isListening, setIsListening] = useState(false);
 
 	const [triggerRender, setTriggerRender] = useState(false);
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>, close: () => void) =>{
@@ -214,15 +166,7 @@ function Dashboard() {
       }
       getData()
     },[selectedRoom,count])
-    const handleMicClick = () => {
-        if (isListening) {
-            SpeechRecognition.stopListening();
-            resetTranscript();
-        } else {
-            SpeechRecognition.startListening();
-        }
-        setIsListening(!isListening);
-    };
+
     useEffect(() => {
       const toggle = async ()=>{
         const res = await toggleDevice(toggleData[0],toggleData[1],toggleData[2],toggleData[3])
@@ -251,12 +195,6 @@ function Dashboard() {
 			</div>
 			<div className=" grow body w-screen h-screen ">
 				<h1 className="text-black font-serif text-center text-7xl">Dashboard</h1>
-                <button onClick={handleMicClick} style={{ width: '180px', height: '100px',background:'brown'}} >
-                    <span >
-                        Voice Assistance
-                        <img src={mic_icon} alt="Mic" style={{ width: '50px', height: '50px',margin:'auto' }} />
-                    </span>
-                </button>
         
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
