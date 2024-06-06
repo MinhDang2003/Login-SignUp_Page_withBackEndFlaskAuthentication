@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState ,useEffect} from 'react';
 import Webcam from 'react-webcam';
 import Sidebar from "../component/Sidebar";
 import {axiosPublic} from '../api/axios';
@@ -18,6 +18,11 @@ const WebcamCapture = () => {
   const [images, setImages] = useState<string[]>([]);
   const [verified,setVerified] = useState(false)
   const [waitVerify,setWaitVerify] = useState(false)
+
+  const imagesRef = useRef(images); // Create a ref for images
+  useEffect(() => {
+    imagesRef.current = images;
+  }, [images]);
   const startCapture = React.useCallback(() => {
     console.log("Im rendered")
     setCountUp(0)
@@ -40,7 +45,8 @@ const WebcamCapture = () => {
 
     async function sendRequest(attempt = 0) {
       try {
-        const response = await axiosPrivate.post('/api/getTrainImgs', { img_arr : images });
+        
+        const response = await axiosPrivate.post('/api/getTrainImgs', { img_arr : imagesRef.current });
         console.log(response?.data);
         setErrorMessage("");
         return response;
@@ -92,7 +98,7 @@ const WebcamCapture = () => {
     const intervalId = setInterval(() => {
       const imageSrc = webcamRef.current?.getScreenshot();
       if (imageSrc) {
-        setImages(prevImages => [...prevImages, imageSrc]);
+        setImages(prevImages => [imageSrc]);
       }
       setCountUp(prevCount => {
         const newCount = prevCount + 1;
@@ -103,7 +109,7 @@ const WebcamCapture = () => {
 
     async function sendRequest(attempt = 0) {
       try {
-        const response = await axiosPrivate.post('/api/verification', { input_img : images });
+        const response = await axiosPrivate.post('/api/verification', { input_img : imagesRef.current });
         console.log(response?.data);
         setErrorMessage("");
         return response;
