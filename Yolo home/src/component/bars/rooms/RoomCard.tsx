@@ -1,8 +1,8 @@
-import { Box , useTheme} from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { tokens } from "../../../theme";
 import StatBox from "../../StatBox"
 function RoomCard(data) {
-    const room = data.data[0]
+  const room = data.data[0]
 
     const selected = (data.data[1] == room.room_id)
     const setSelected = data.data[2]

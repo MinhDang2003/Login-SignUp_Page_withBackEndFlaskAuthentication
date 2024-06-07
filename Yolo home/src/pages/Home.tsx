@@ -177,7 +177,7 @@ function Home() {
 				<Sidebarr />
 			</div>
 			<div className="grow body w-screen h-screen">
-				<h1 className="text-black font-serif text-center text-7xl">Dashboard</h1>
+				<h1 className="text-black font-serif text-center text-7xl">Home</h1>
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
 						<img src={tempicon} className="h-32 w-32" />
@@ -221,7 +221,7 @@ function Home() {
 						<div style={{ height: "auto", width: "100%" }}>
 							<h1>{stateList[state]}</h1>
 						</div>
-						<div className="line-graph" style={{ height: "500px", width: "90%" }}>
+						<div className="line-graph" style={{ width: "90%", height: "auto" }}>
 							<Line options={options} data={data} />
 						</div>
 						<div className="flex flex-row justify-center items-center mode-buttons" style={{ height: "auto", width: "100%" }}>

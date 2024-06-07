@@ -3,19 +3,19 @@ import Users from "../component/Users";
 import 'regenerator-runtime/runtime';
 
 import { useTheme } from "@mui/material";
-import { useEffect, useState } from 'react'
 import Sidebarr from "../component/Sidebar";
-import {getAllRoomsData,getDevicesOfRoom,toggleDevice} from '../business/HomePageData'
-import RoomBar from '../component/bars/rooms/RoomsBar'
-import DevicesBar from '../component/bars/devices/DevicesBar'
-import { tokens } from "../theme.tsx";
+import RoomBar from '../component/bars/rooms/RoomsBar';
+import DevicesBar from '../component/bars/devices/DevicesBar';
+import { getAllRoomsData, getDevicesOfRoom, toggleDevice } from '../business/HomePageData';
 import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
-import RoomsApi from '../api_copy/RoomsApi'
-import DeviceApi from '../api_copy/DeviceApi'
+import RoomsApi from '../api_copy/RoomsApi';
+import DeviceApi from '../api_copy/DeviceApi';
+import { tokens } from "../theme.tsx";
+
 const styles = {
     modal: {
-        position: 'relative' as 'relative',
+        position: 'relative',
         padding: '20px',
         border: '2px solid black',
         borderRadius: '10px',
@@ -23,19 +23,19 @@ const styles = {
     },
     form: {
         display: 'flex',
-        flexDirection: 'column' as 'column',
+        flexDirection: 'column',
         alignItems: 'center',
-        marginTop: '30px', // Added margin to push form down below close button
+        marginTop: '30px',
     },
     label: {
         color: 'black',
         backgroundColor: 'beige',
         padding: '10px',
         borderRadius: '5px',
-        fontWeight: 'bold' as 'bold',
+        fontWeight: 'bold',
         marginBottom: '10px',
         width: '100%',
-        textAlign: 'left' as 'left',
+        textAlign: 'left',
     },
     input: {
         backgroundColor: 'white',
@@ -44,7 +44,7 @@ const styles = {
         borderRadius: '5px',
         padding: '10px',
         width: '100%',
-        boxSizing: 'border-box' as 'border-box',
+        boxSizing: 'border-box',
         marginBottom: '15px',
     },
     submitButton: {
@@ -54,30 +54,30 @@ const styles = {
         borderRadius: '5px',
         padding: '10px 20px',
         cursor: 'pointer',
-        fontWeight: 'bold' as 'bold',
+        fontWeight: 'bold',
     },
     closeButton: {
-        position: 'absolute' as 'absolute',
+        position: 'absolute',
         top: '10px',
         right: '10px',
         backgroundColor: 'black',
         color: 'white',
         border: 'none',
-        borderRadius: '0%', // Make the button square
+        borderRadius: '0%',
         width: '30px',
         height: '30px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
-        fontWeight: 'bold' as 'bold',
+        fontWeight: 'bold',
         fontSize: '20px',
         lineHeight: '20px',
     },
     errorMessage: {
         color: 'red',
-        fontWeight: 'bold' as 'bold',
-        textAlign: 'center' as 'center',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 };
 
@@ -168,23 +168,19 @@ function Dashboard() {
     },[selectedRoom,count])
 
     useEffect(() => {
-      const toggle = async ()=>{
-        const res = await toggleDevice(toggleData[0],toggleData[1],toggleData[2],toggleData[3])
-        if (res) {
-            setTimeout(()=>{
-              setCount((count+1)%2)
-            },1000)    
+        if (toggleData) {
+            const toggle = async () => {
+                const res = await toggleDevice(toggleData[0], toggleData[1], toggleData[2], toggleData[3]);
+                if (res) {
+                    setTimeout(() => setCount((count + 1) % 2), 1000);
+                }
+            };
+            toggle();
         }
-      }
-      if (toggleData) {
-          toggle()
-      }
-    },[toggleData])
+    }, [toggleData]);
+
     useEffect(() => {
-        setTimeout(()=>{
-            setCount((count+1)%2)
-          },1000)  
-        // Any logic that needs to run after state change
+        setTimeout(() => setCount((count + 1) % 2), 1000);
     }, [triggerRender]);
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
@@ -358,14 +354,13 @@ function Dashboard() {
                             />
                         </form>
                     </div>
-                )}
-            </Popup>
+                    <DevicesBar data={[devicesData.devices, setToggleData]} />
+                </div>
+            </div>
             {error && (
                 <Popup open={true} onClose={closeErrorPopup} modal>
-                    <div className='modal' style={styles.modal}>
-                        <button onClick={closeErrorPopup} style={styles.closeButton}>
-                            &times;
-                        </button>
+                    <div className="modal" style={styles.modal}>
+                        <button onClick={closeErrorPopup} style={styles.closeButton}>&times;</button>
                         <div style={styles.errorMessage}>{error}</div>
                     </div>
                 </Popup>
@@ -392,4 +387,5 @@ function Dashboard() {
 	);
 	
 }
+
 export default Dashboard;
