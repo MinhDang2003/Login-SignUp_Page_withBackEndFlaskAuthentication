@@ -128,8 +128,10 @@ class Presenter:
             start = datetime.combine(datetime.today(), time.min)
             end = datetime.combine(datetime.today(), time.min)
             res= MongoAPI.getLog(limit_record=1,start_date=start,end_date=end,current=True)
+            
             current_log = None
             for item in res:
+                print(item)
                 current_log = item[help_dict[choice]]
             if current_log is None:
                 current_log = 0
@@ -326,9 +328,9 @@ class Presenter:
     
     @classmethod
     def _updateAppliances(cls,app_type:str,val):
-        # for item in ['room_id','appliance_id']:
-        #     if item not in request.json:
-        #         return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
+        for item in ['room_id','appliance_id']:
+            if item not in request.json:
+                return jsonify({"msg": f"Invalid update appliances request - missing {item} field"}) , 400
         room_id = request.json.get("room_id",None)
         app_id = request.json.get("appliance_id",None)
         result = MongoAPI.updateAppliance(room_id=room_id,app_id=app_id,app_type=app_type,val=val)
