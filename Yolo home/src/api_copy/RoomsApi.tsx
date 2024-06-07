@@ -6,7 +6,6 @@ async function getAllRooms() {
         return roomsData
     }
     catch (err) {
-        console.log(err)
         return {}
     }
 }
@@ -16,7 +15,6 @@ async function getDevicesByRoomID(roomID){
         return devices
     } 
     catch (err) {
-        console.log(err)
         return {}
     }
 }

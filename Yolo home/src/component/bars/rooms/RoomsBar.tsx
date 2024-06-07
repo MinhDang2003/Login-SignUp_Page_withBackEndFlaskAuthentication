@@ -5,7 +5,6 @@ import { tokens } from "../../../theme.tsx";
 
 function RoomBar(data:any){
     let rooms = data.data[0].map((item)=>({"room_id":item.room_id,"selected":item.selected,"devices":item.devices}))
-    console.log(rooms.length,676)
     const viewmore  = rooms.length > 4
     const [viewAll,setViewAll] = useState(false)
     const numDisplay = viewmore?4:rooms.length
@@ -21,7 +20,7 @@ function RoomBar(data:any){
         justifyContent="start"
         gridColumn="span 12"
         gridRow="span 1"
-        style={{backgroundColor:colors.primary[400]}}
+        
         >
         {
                 rooms.slice(0,viewAll?rooms.length:numDisplay).map((item)=> (
