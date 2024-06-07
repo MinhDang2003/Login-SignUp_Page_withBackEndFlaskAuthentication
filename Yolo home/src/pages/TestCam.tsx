@@ -168,7 +168,7 @@ const WebcamCapture = () => {
             </div>
             <div className="flex-1">
                 <div className="body w-full h-full flex flex-col items-center">
-                    <h1 className="text-black font-serif text-center text-7xl">Face Recognition Setup</h1>
+                    <h1 className="text-black font-serif text-center text-7xl">Facial Verification</h1>
                     <div className="mt-5 flex justify-center items-center ">
                         <div className="overflow-hidden p-3 bg-[#DAC0A3]" style={{ width: "70%", height: "auto" }}>
                             <Webcam ref={webcamRef} mirrored={true} screenshotFormat="image/jpeg" />
