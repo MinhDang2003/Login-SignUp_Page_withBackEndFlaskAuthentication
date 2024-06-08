@@ -29,7 +29,7 @@ const styles = {
         marginTop: '30px',
     },
     label: {
-        color: '#DAC0A3', // Same color as background
+        color: 'black', // Same color as background
         backgroundColor: 'beige',
         padding: '10px',
         borderRadius: '5px',
@@ -50,8 +50,8 @@ const styles = {
     },
     submitButton: {
         backgroundColor: 'beige',
-        color: '#DAC0A3', // Same color as background
-        border: '2px solid #DAC0A3', // Same color as background
+        color: 'black', // Same color as background
+        border: '2px solid black', // Same color as background
         borderRadius: '5px',
         padding: '10px 20px',
         cursor: 'pointer',
