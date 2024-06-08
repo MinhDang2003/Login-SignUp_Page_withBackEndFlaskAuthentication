@@ -55,7 +55,7 @@ function Device(data){
         <>
         <Box
         sx={{ width:'200px',borderRadius:'15%', margin: '15px 10px 15px 10px' }}
-        backgroundColor={isOn? colors.greenAccent[300]:colors.primary[900]}
+        backgroundColor={isOn? colors.greenAccent[300]:"#F8F0E5"}
         display="flex"
         alignItems="center"
         justifyContent="center"

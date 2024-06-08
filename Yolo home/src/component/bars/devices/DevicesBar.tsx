@@ -2,6 +2,7 @@ import Device from "./Device";
 import { Box,useTheme } from "@mui/material";
 import { tokens } from "../../../theme.tsx";
 function DevicesBar(data) {
+    console.log(data.data,22334)
     const devices = data.data[0]
     const toggleFunction = data.data[1]
     const theme = useTheme();
@@ -15,7 +16,6 @@ function DevicesBar(data) {
           justifyContent="start"
                     gridColumn="span 12"
                     gridRow="span 1"
-                    
         >
         {
             devices.map((item)=> <Device data={[item,toggleFunction]}></Device>)
