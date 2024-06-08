@@ -29,7 +29,7 @@ const styles = {
         marginTop: '30px',
     },
     label: {
-        color: 'black', // Same color as background
+        color: 'black',
         backgroundColor: 'beige',
         padding: '10px',
         borderRadius: '5px',
@@ -50,8 +50,8 @@ const styles = {
     },
     submitButton: {
         backgroundColor: 'beige',
-        color: 'black', // Same color as background
-        border: '2px solid black', // Same color as background
+        color: 'black',
+        border: '2px solid black',
         borderRadius: '5px',
         padding: '10px 20px',
         cursor: 'pointer',
@@ -106,9 +106,9 @@ function Dashboard() {
             } else if (event.target.name === "removeRoom") {
                 await RoomsApi.removeRoom(inputs.roomID);
             } else if (event.target.name === "addDevice") {
-                await DeviceApi.addDevice(inputs.roomID, inputs.deviceID, inputs.deviceType, inputs.feedID);
+                await DeviceApi.addDevice(selectedRoom, inputs.deviceID, inputs.deviceType, inputs.feedID);
             } else if (event.target.name === "removeDevice") {
-                await DeviceApi.removeDevice(inputs.roomID, inputs.deviceID);
+                await DeviceApi.removeDevice(selectedRoom, inputs.deviceID);
             }
             setTriggerRender(!triggerRender);
             close();
@@ -172,7 +172,7 @@ function Dashboard() {
                     <div className="flex justify-between items-center">
                         <h1 className="text-black font-serif ml-4">Rooms</h1>
                         <div className="flex space-x-4 mr-4">
-                            <Popup trigger={<button className="p-2 bg-blacks text-[#DAC0A3] rounded">&#43; Add Room</button>} modal nested>
+                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded">&#43; Add Room</button>} modal nested>
                                 {close => (
                                     <div className='modal' style={styles.modal}>
                                         <button onClick={close} style={styles.closeButton}>
