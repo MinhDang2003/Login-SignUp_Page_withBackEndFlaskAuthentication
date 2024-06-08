@@ -17,7 +17,6 @@ app = Flask(__name__)
 # app.config['SESSION_USE_SIGNER'] = True
 # app.config['SESSION_REDIS'] = redis.from_url("redis://127.0.0.1:6379")
 # server_session = Session(app)
-app.config["SECRET_KEY"] = b'6hc/_gsh,./;2ZZx3c6_s,1//'
 #app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds=30000)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(seconds=48000000)
