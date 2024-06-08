@@ -8,23 +8,26 @@ import hashlib, binascii, os
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import pandas as pd
-from deepface import DeepFace
+
 
 def hash_password(password: str):
     salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
     pwhash = hashlib.pbkdf2_hmac('sha512',password.encode('utf-8'),salt,100000)
     pwhash = binascii.hexlify(pwhash)
     return (salt + pwhash).decode('ascii')
-uri = "mongodb+srv://minhdangquocminh03:VYG5T0R0rmS9MKZ0@cluster0.28iompk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
+uri = 'mongodb+srv://minhdangquocminh03:da232@cluster0.28iompk.mongodb.net/'
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.get_database('SmartHome')
 records = db.Log
 users = db.Users
 rooms = db.Rooms
+temp = db.temp
+humid = db.humid
+brightness = db.brightness
+
 users.create_index([("email", 1)],unique=True,sparse=True)
 records.create_index([("date", 1)],unique=True,sparse=True)
-rooms.create_index([('room_id',1),('appliances.app_id',1),('appliances.app_type',1)],unique=True,sparse=True)
+rooms.create_index([('room_id',1),('applanices.app_id',1),('appliances.app_type',1)],unique=True,sparse=True)
 class MongoAPI():
     #Authentication
     
@@ -165,29 +168,6 @@ class MongoAPI():
             return found.inserted_id
         return found['_id']
     
-    # @classmethod
-    # def addTemp(cls,temp: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
-    #     date = date - timedelta(days=5)
-    #     id = MongoAPI.createNewRecord(date)
-    #     hour = date + timedelta(hours=hour)
-    #     if records.find_one({"_id": id,"temperature.hour": hour}) is None:
-            
-    #         result = records.find_one_and_update({"_id": id},{'$push': {'temperature': {'value': [temp],'hour': hour}}})
-    #         return result
-            
-    #     return records.find_one_and_update({"_id": id, 'temperature.hour': hour},{'$push': {'temperature.$.value': temp}})
-    
-    # @classmethod
-    # def addHumid(cls,humid: float,hour: int = datetime.now().hour,date = datetime.combine(datetime.today(), time.min)): 
-    #     id = MongoAPI.createNewRecord(date)
-    #     hour = date + timedelta(hours=hour)
-    #     if records.find_one({"_id": id,"humidity.hour": hour}) is None:
-            
-    #         result = records.find_one_and_update({"_id": id},{'$push': {'humidity': {'value': [humid],'hour': hour}}})
-    #         return result
-        
-    #     return records.find_one_and_update({"_id": id, 'humidity.hour': hour},{'$push': {'humidity.$.value': humid}})
-    
     @classmethod
     def addLog(cls,option:int,value:float,date: datetime=datetime.combine(datetime.today(), time.min), hour: int = datetime.now().hour):
         if option < 0 or option > 2:
@@ -198,7 +178,7 @@ class MongoAPI():
             field = 'humidity'
         if option == 2: #bright
             field = 'brightness'
-        print(datetime.now())
+        #print(datetime.now())
         id = MongoAPI.createNewRecord(date)
         hour = date + timedelta(hours = hour)
         
@@ -279,15 +259,48 @@ class MongoAPI():
         
         return res
 
+    @classmethod
+    def addLogData(cls,option:int,feedID:str,value:float,timestamp:datetime = datetime.now()):
+        if option < 0 or option > 2:
+            raise ValueError("Invalid: option for addLog out of range")
+        if option == 0: #temp
+            return temp.insert_one({"timestamp" : timestamp , "feedID": feedID , "value": value})
+        if option == 1: #humid
+            return humid.insert_one({"timestamp" : timestamp , "feedID": feedID , "value": value})
+        if option == 2: #bright
+            return brightness.insert_one({"timestamp" : timestamp , "feedID": feedID , "value": value})
+        #print(datetime.now())
+        
+    @classmethod
+    def getLogData(cls,limit_record: int,start_date: datetime,end_date : datetime = datetime.combine(datetime.today(), time.min),current=False):
+        pass
+#print(temp.find_one()['timestamp'].hour)
+# start = 20
+# end = 45     
+# # MongoAPI().addLogData(0,'temp',random.uniform(start,end))
+# # MongoAPI().addLogData(1,'temp',random.uniform(start,end))
+# # MongoAPI().addLogData(2,'temp',random.uniform(start,end))
+# date_today = datetime.now()
+# next_month = date_today + timedelta(days=2)
+# minutes = pd.date_range(date_today, next_month, freq='T')
+
+# start = 1  # define your start range for random.uniform
+# end = 100  # define your end range for random.uniform
+
+# data = {'timestamp': minutes, 'value': [random.uniform(start, end) for _ in range(len(minutes))]}
+# df = pd.DataFrame(data)
+
+# # Convert DataFrame to list of dictionaries for insertion into MongoDB
+# records = df.to_dict('records')
+# temp.insert_many(records)
+# humid.insert_many(records)
+# brightness.insert_many(records)
 # start = 20
 # end = 45
-# for i in range(0,100):
+# for i in range(0,22):
 #     for j in range(0,24):
-#         for z in range(0,5):
-#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
-#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
-#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i),j)
+#         for z in range(0,4):
+#             MongoAPI.addLog(0,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
+#             MongoAPI.addLog(1,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
+#             MongoAPI.addLog(2,random.uniform(start,end),datetime.combine(datetime.today(), time.min)+timedelta(days=i)-timedelta(days=5),j)
    
-
-
-

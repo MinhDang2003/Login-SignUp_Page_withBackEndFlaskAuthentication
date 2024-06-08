@@ -1,19 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../App.css";
-import Sidebar from "../component/Sidebar";
 import tempicon from "../assets/temperature.png";
 import humidicon from "../assets/humidity.png";
 import brighticon from "../assets/brightness.png";
 import { axiosPublic } from "../api/axios";
-import { useEffect } from "react";
-import {
-	Chart as ChartJS,
-	CategoryScale,
-	LinearScale,
-	PointElement,
-	LineElement,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement } from "chart.js";
 import { Line } from "react-chartjs-2";
+import Sidebarr from "../component/Sidebar";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -21,9 +14,9 @@ function Home() {
 	const stateList = ["Temperature", "Humidity", "Brightness"];
 	const modeList = ["Day", "Week", "Month"];
 	
-	const [currentTemperature, setCurrentTemperature]= useState(0);
-	const [currentHumidity, setCurrentHumidity]= useState(0);
-	const [currentBrightness, setCurrentBrightness]= useState(0);
+	const [currentTemperature, setCurrentTemperature] = useState(0);
+	const [currentHumidity, setCurrentHumidity] = useState(0);
+	const [currentBrightness, setCurrentBrightness] = useState(0);
 
 	const [temperatureDay, setTemperatureDay] = useState<number[]>([]);
 	const [humidityDay, setHumidityDay] = useState<number[]>([]);
@@ -41,36 +34,36 @@ function Home() {
 	const [weekLabel, setWeekLabel] = useState<string[]>([]);
 	const [dayLabel, setDayLabel] = useState<string[]>([]);
 
-
-	const getCurrentStat = async ()=> {
+	const getCurrentStat = async () => {
 		try {
-            const responseTemp = await axiosPublic.post("/api/current_temperature");
-            const dataTemp = responseTemp.data.value;
-            setCurrentTemperature(dataTemp);
-            const responseHumid = await axiosPublic.post("/api/current_humidity");
-            const dataHumid = responseHumid.data.value;
-            setCurrentHumidity(dataHumid);
-            const responseBrightness = await axiosPublic.post("/api/current_brightness");
-            const dataBrightness = responseBrightness.data.value;
-			setCurrentBrightness(dataBrightness);
-	}catch (error) {
-		console.log(error);
-	}
+			const responseTemp = await axiosPublic.post("/api/current_temperature");
+			setCurrentTemperature(Number(responseTemp.data.value).toFixed(2));
+	
+			const responseHumid = await axiosPublic.post("/api/current_humidity");
+			setCurrentHumidity(Number(responseHumid.data.value).toFixed(2));
+	
+			const responseBrightness = await axiosPublic.post("/api/current_brightness");
+			setCurrentBrightness(Number(responseBrightness.data.value).toFixed(2));
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	
-
 	useEffect(() => {
-		setInterval(getCurrentStat,5000);
+		getCurrentStat();
+		const interval = setInterval(getCurrentStat, 1000);
 		fetchData(0); // Fetch initial data for day mode
 		fetchData(1);
 		fetchData(2);
+		
+		return () => clearInterval(interval); // Cleanup interval on unmount
 	}, []);
 
 	const fetchData = async (option: number) => {
 		try {
 			const responseTemp = await axiosPublic.post("/api/temperature", { option });
 			const dataTemp = responseTemp.data;
-			
+
 			const responseHumid = await axiosPublic.post("/api/humidity", { option });
 			const dataHumid = responseHumid.data;
 
@@ -78,76 +71,40 @@ function Home() {
 			const dataBrightness = responseBrightness.data;
 
 			if (option === 0) {
-				const tempArray: number[] = [];
-				for (let i = 0; i < dataTemp.temperature.length; i++) {
-					tempArray.push(dataTemp.temperature[i]['value']);
-				}
+				const tempArray = dataTemp.temperature.map(item => item.value);
 				setTemperatureDay(tempArray);
 
-				const humidArray: number[] = [];
-				for (let i = 0; i < dataHumid.humidity.length; i++) {
-					humidArray.push(dataHumid.humidity[i]['value']);
-				}
+				const humidArray = dataHumid.humidity.map(item => item.value);
 				setHumidityDay(humidArray);
 
-				const brightArray: number[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-					brightArray.push(dataBrightness.brightness[i]['value']);
-				}
+				const brightArray = dataBrightness.brightness.map(item => item.value);
 				setBrightnessDay(brightArray);
 
-				const extractedArray: string[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-				extractedArray.push(dataBrightness.brightness[i]['hour']);
-				}
+				const extractedArray = dataBrightness.brightness.map(item => item.hour);
 				setDayLabel(extractedArray);
 			} else if (option === 1) {
-				const tempArray: number[] = [];
-				for (let i = 0; i < dataTemp.temperature.length; i++) {
-					tempArray.push(dataTemp.temperature[i]['value']);
-				}
+				const tempArray = dataTemp.temperature.map(item => item.value);
 				setTemperatureWeek(tempArray);
 
-				const humidArray: number[] = [];
-				for (let i = 0; i < dataHumid.humidity.length; i++) {
-					humidArray.push(dataHumid.humidity[i]['value']);
-				}
+				const humidArray = dataHumid.humidity.map(item => item.value);
 				setHumidityWeek(humidArray);
 
-				const brightArray: number[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-					brightArray.push(dataBrightness.brightness[i]['value']);
-				}
+				const brightArray = dataBrightness.brightness.map(item => item.value);
 				setBrightnessWeek(brightArray);
 
-				const extractedArray: string[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-				extractedArray.push(dataBrightness.brightness[i]['date']);
-				}
+				const extractedArray = dataBrightness.brightness.map(item => item.date);
 				setWeekLabel(extractedArray);
 			} else if (option === 2) {
-				const tempArray: number[] = [];
-				for (let i = 0; i < dataTemp.temperature.length; i++) {
-					tempArray.push(dataTemp.temperature[i]['value']);
-				}
+				const tempArray = dataTemp.temperature.map(item => item.value);
 				setTemperatureMonth(tempArray);
 
-				const humidArray: number[] = [];
-				for (let i = 0; i < dataHumid.humidity.length; i++) {
-					humidArray.push(dataHumid.humidity[i]['value']);
-				}
+				const humidArray = dataHumid.humidity.map(item => item.value);
 				setHumidityMonth(humidArray);
 
-				const brightArray: number[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-					brightArray.push(dataBrightness.brightness[i]['value']);
-				}
+				const brightArray = dataBrightness.brightness.map(item => item.value);
 				setBrightnessMonth(brightArray);
 
-				const extractedArray: string[] = [];
-				for (let i = 0; i < dataBrightness.brightness.length; i++) {
-				extractedArray.push(dataBrightness.brightness[i]['date']);
-				}
+				const extractedArray = dataBrightness.brightness.map(item => item.date);
 				setMonthLabel(extractedArray);
 			}
 		} catch (error) {
@@ -155,26 +112,17 @@ function Home() {
 		}
 	};
 
-	// for (let i = 0; i < 24; i++) {
-	// 	dayLabel.push(dataBrightness.brightness[i]['hour']);
-	// }
-	// for (let i = 0; i < dataBrightness.brightness.length; i++) {
-	// 	weekLabel.push(dataBrightness.brightness[i]['date']);
-	// }
-	// for (let i = 0; i<dataBrightness.brightness.length; i++) {
-	// 	monthLabel.push(dataBrightness.brightness[i]['date']);
-	// }
 	const labelList = [dayLabel, weekLabel, monthLabel];
 	const dataList = [
 		[temperatureDay, temperatureWeek, temperatureMonth],
-		[humidityDay, humidityMonth, humidityWeek],
+		[humidityDay, humidityWeek, humidityMonth],
 		[brightnessDay, brightnessWeek, brightnessMonth],
 	];
 
 	const [state, setState] = useState(0);
 	const [mode, setMode] = useState(0);
 
-	const labels = labelList[mode].map((label) => label.toString());
+	const labels = labelList[mode].map(label => label.toString());
 
 	const options = {
 		responsive: true,
@@ -209,7 +157,7 @@ function Home() {
 	};
 
 	const updateDataAndLabels = (newState: number, newMode: number) => {
-		const labels = labelList[newMode].map((label) => label.toString());
+		const labels = labelList[newMode].map(label => label.toString());
 		const data = {
 			labels,
 			datasets: [
@@ -224,11 +172,11 @@ function Home() {
 	};
 
 	return (
-		<div className="w-screen h-screen  items-start">
-			<div className="h-12">
-				<Sidebar />
+		<div className="flex h-screen w-screen min-h-screen items-start overflow-y-auto">
+			<div className="sticky h-screen left-0 top-0">
+				<Sidebarr />
 			</div>
-			<div className="body w-screen h-screen ">
+			<div className="grow body w-screen h-screen">
 				<h1 className="text-black font-serif text-center text-7xl">Home</h1>
 				<div className="flex flex-wrap justify-center field1 bg-[#DAC0A3] shadow-xl">
 					<div className="flex flex-col p-0 mx-auto justify-center h-64 w-64 items-center field1Item rounded-3xl bg-black">
@@ -244,9 +192,9 @@ function Home() {
 						<div>{currentBrightness}%</div>
 					</div>
 				</div>
-				<div className="mt-5  items-center bg-[#DAC0A3] shadow-xl ">
+				<div className="mt-5 items-center bg-[#DAC0A3] shadow-xl">
 					<div>
-						<h1 className=" text-black"> History Log</h1>
+						<h1 className="text-black"> History Log</h1>
 
 						<button className="m-5 w-40" onClick={() => toggleState(0)}>
 							{"Temperature"}
@@ -273,16 +221,10 @@ function Home() {
 						<div style={{ height: "auto", width: "100%" }}>
 							<h1>{stateList[state]}</h1>
 						</div>
-						<div
-							className="line-graph"
-							style={{ height: "500px", width: "90%" }}
-						>
+						<div className="line-graph" style={{ width: "90%", height: "auto" }}>
 							<Line options={options} data={data} />
 						</div>
-						<div
-							className="flex flex-row justify-center items-center mode-buttons"
-							style={{ height: "auto", width: "100%" }}
-						>
+						<div className="flex flex-row justify-center items-center mode-buttons" style={{ height: "auto", width: "100%" }}>
 							<div style={{ height: "auto", width: "100px" }}>
 								<h2>{modeList[mode]}</h2>
 							</div>

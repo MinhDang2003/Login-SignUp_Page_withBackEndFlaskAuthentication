@@ -10,20 +10,29 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mui/icons-material": "^5.15.18",
+    "@mui/material": "^5.15.19",
     "axios": "^1.6.8",
     "chart.js": "^4.4.3",
-    "faker": "^6.6.6",
+    "faker": "^5.5.3",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-easy-crop": "^5.0.7",
     "react-hook-form": "^7.51.3",
-    "react-router-dom": "6.4"
+    "react-image-crop": "^11.0.5",
+    "react-pro-sidebar": "^0.7.1",
+    "react-router-dom": "6.4",
+    "react-webcam": "^7.2.0",
+    "reactjs-popup": "^2.0.6",
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
     "@hookform/devtools": "^4.3.1",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
+    "@types/react-speech-recognition": "^3.9.5",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",

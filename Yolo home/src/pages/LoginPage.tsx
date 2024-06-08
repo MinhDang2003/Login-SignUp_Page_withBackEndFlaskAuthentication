@@ -84,15 +84,15 @@ function Login() {
                 </div>
                 <img src={COVER_IMAGE} className="w-full h-full object-cover"/>
             </div>
-            <div className='w-1/2 h-full bg-[#E0E0E0] flex flex-col pt-10 pl-[44px] p-20 justify-center'>
+            <div className='w-1/2 h-full bg-[#faf0dc] flex flex-col pt-10 pl-[44px] p-20 justify-center'>
                 <div className='w-full flex flex-row items-center '>
                     <img src={HCMUTlogo} className='h-12 mr-6'/>
                     <h1 className='text-3xl text-[#060606] font-semibold'> HCMUT-CC01-TeamDEV</h1>
                 </div>
                 <div className='w-full flex flex-col mt-12 max-w-[650px]'>
                     <div className='w-full flex flex-col mb-2'>
-                        <h3 className='text-3xl fornt-semibold mb-4'>Login</h3>
-                        <p className='text-base mb-2'>Welcome Back! Please enter your details.</p>
+                        <h3 className='text-3xl text-[#060606] font-semibold mb-4'>Login</h3>
+                        <p className='text-base text-[#060606] mb-2'>Welcome Back! Please enter your details.</p>
                     </div>
 
                     
@@ -125,10 +125,10 @@ function Login() {
                         <div className='w-full flex items-center justify-between mt-3'>
                             <div className='w-full flex items-center '>
                                 <input type="checkbox"  id="saved" {...register("saved")} className='w-4 h-4 mr-2'></input>
-                                <p className ='text-sm'>Remember me</p>
+                                <p className ='text-sm text-[#060606]'>Remember me</p>
                             </div>
 
-                            <p className='text-sm font-medium whitespace-nowrap cursor-pointer underline underline-offset-2'>Forgot Password</p>
+                            {/* <p className='text-sm text-[#060606] font-medium whitespace-nowrap cursor-pointer underline underline-offset-2'>Forgot Password</p> */}
                         </div>
                         
 

@@ -4,20 +4,19 @@ import sys
 import time
 
 from Model.MongoSetup import *
-ADAFRUIT_IO_KEY = 'aio_ieox89ZafTBlkpcICZFkmfANhCaW'
+ADAFRUIT_IO_KEY = 'aio_xgOp92q3yRLYvYsZRrmJ8YlA5x7T'
 ADAFRUIT_IO_USERNAME = 'grassni'
 ADAFRUIT_IO_URL = 'io.adafruit.com'
 
 IO_FEED_USERNAME = 'grassni'
 
-temp = []
 
 class AdaAPI:
     _current_feed=None
     _FEED_ID_List = ['face','temp','humidity','led1','led2','led3','led4','light','speed']
     _temp = []
     #_FEED_ID_List = ['temperature']
-    _client = MQTTClient(username=ADAFRUIT_IO_USERNAME,key=ADAFRUIT_IO_KEY,service_host=ADAFRUIT_IO_URL,secure=True)
+    _client = MQTTClient(username=ADAFRUIT_IO_USERNAME,key=ADAFRUIT_IO_KEY,secure=True)
     def __init__(self):
       self.client = AdaAPI._client
       self.client.on_connect       = AdaAPI._connected
@@ -29,7 +28,10 @@ class AdaAPI:
       except Exception as e:
         print('Unable to connect to MQTT server {}{}'.format(type(e).__name__,e))
         sys.exit()
-      
+    
+    def getFeedlst(self):
+      return AdaAPI._FEED_ID_List
+    
     def _connected(client):
       print("Connected to AdaFruit successfully")
       for feed_id in AdaAPI._FEED_ID_List:
@@ -76,7 +78,3 @@ class AdaAPI:
       except KeyboardInterrupt:
         self.client.disconnect()
         sys.exit(1)
-
-
-
-
