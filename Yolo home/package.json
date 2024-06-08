@@ -20,6 +20,7 @@
     "react-dom": "^18.2.0",
     "react-easy-crop": "^5.0.7",
     "react-hook-form": "^7.51.3",
+    "react-image-crop": "^11.0.5",
     "react-pro-sidebar": "^0.7.1",
     "react-router-dom": "6.4",
     "react-webcam": "^7.2.0",
