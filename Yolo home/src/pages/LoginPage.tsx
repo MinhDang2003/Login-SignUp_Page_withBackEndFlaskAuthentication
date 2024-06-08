@@ -128,7 +128,7 @@ function Login() {
                                 <p className ='text-sm text-[#060606]'>Remember me</p>
                             </div>
 
-                            <p className='text-sm text-[#060606] font-medium whitespace-nowrap cursor-pointer underline underline-offset-2'>Forgot Password</p>
+                            {/* <p className='text-sm text-[#060606] font-medium whitespace-nowrap cursor-pointer underline underline-offset-2'>Forgot Password</p> */}
                         </div>
                         
 
