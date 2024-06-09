@@ -172,7 +172,7 @@ function Dashboard() {
                     <div className="flex justify-between items-center">
                         <h1 className="text-black font-serif ml-4">Rooms</h1>
                         <div className="flex space-x-4 mr-4">
-                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded">&#43; Add Room</button>} modal nested>
+                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded" style={{ width: '160px', height: '40px' }}>&#43; Add Room</button>} modal nested>
                                 {close => (
                                     <div className='modal' style={styles.modal}>
                                         <button onClick={close} style={styles.closeButton}>
@@ -197,7 +197,7 @@ function Dashboard() {
                                     </div>
                                 )}
                             </Popup>
-                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded">&#8722; Remove Room</button>} modal nested>
+                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded" style={{ width: '160px', height: '40px' }}>&#8722; Remove Room</button>} modal nested>
                                 {close => (
                                     <div className='modal' style={styles.modal}>
                                         <button onClick={close} style={styles.closeButton}>
@@ -230,7 +230,7 @@ function Dashboard() {
                     <div className="flex justify-between items-center">
                         <h1 className="text-black font-serif ml-4">Devices</h1>
                         <div className="flex space-x-4 mr-4">
-                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded">&#43; Add Device</button>} modal nested>
+                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded" style={{ width: '160px', height: '40px' }}>&#43; Add Device</button>} modal nested>
                                 {close => (
                                     <div className='modal' style={styles.modal}>
                                         <button onClick={close} style={styles.closeButton}>
@@ -279,7 +279,7 @@ function Dashboard() {
                                 )}
                             </Popup>
 
-                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded">&#8722; Remove Device</button>} modal nested>
+                            <Popup trigger={<button className="p-2 bg-black text-[#DAC0A3] rounded" style={{ width: '160px', height: '40px' }}>&#8722; Remove Device</button>} modal nested>
                                 {close => (
                                     <div className='modal' style={styles.modal}>
                                         <button onClick={close} style={styles.closeButton}>
