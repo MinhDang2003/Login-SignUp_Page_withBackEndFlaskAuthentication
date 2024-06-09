@@ -131,14 +131,14 @@ class Presenter:
             
             current_log = None
             for item in res:
-                print(item)
+                #print(item)
                 current_log = item[help_dict[choice]]
             if current_log is None:
                 current_log = 0
                 #return jsonify({f"{help_dict[choice]}": current_log}) , 200
                 return jsonify({f"value": current_log}) , 200
             #return jsonify({f"{help_dict[choice]}": (current_log[-1]['value'][-1])}) , 200
-            print(current_log)
+            #print(current_log)
             try:
                 return jsonify({f"value": (current_log[-1]['value'][-1])}) , 200
             except:
@@ -188,7 +188,7 @@ class Presenter:
             if length == 24:
                 return arr
             #print(arr)
-            print(len(arr))
+            #print(len(arr))
             returnAr = []
             for i in range(48):
                 if  arr[-(i+1)]['hour'] > datetime.combine(datetime.today(), time(hour=datetime.now().hour)) :
@@ -200,7 +200,7 @@ class Presenter:
                 returnAr = arr[:48-(i)]
                 break
             
-            print(returnAr)
+            #print(returnAr)
             if len(returnAr) >= 24:
                 return returnAr[-24:]
             if len(returnAr) == 0:
@@ -424,7 +424,7 @@ class Presenter:
         # image_rgb = image.convert('RGB')
 
         # image_rgb.save('output_image.jpeg')
-        print("HEELLLLL")
+        #print("HEELLLLL")
         instances = []
         embedding_vector = None
         for i in tqdm(range(0, len(img_arr))):
