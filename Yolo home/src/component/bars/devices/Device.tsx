@@ -16,7 +16,6 @@ function Device(data){
     } else if (devices.app_type === "light") {
         deviceImage = light_image;
     }
-    console.log(devices)
     const toggleFunction = data.data[1]
     let isOn;
     let subtitle;
