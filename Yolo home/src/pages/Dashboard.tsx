@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Users from "../component/Users";
 import 'regenerator-runtime/runtime';
-
+import DevicesAPI from "../api_copy/DeviceApi";
 import { useTheme } from "@mui/material";
 import Sidebarr from "../component/Sidebar";
 import RoomBar from '../component/bars/rooms/RoomsBar';
@@ -83,6 +83,7 @@ const styles = {
 };
 
 function Dashboard() {
+    const [mess,setMess] = useState(null)
     const [inputs, setInputs] = useState({});
     const [triggerRender, setTriggerRender] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -122,8 +123,27 @@ function Dashboard() {
     const closeErrorPopup = () => {
         setError(null);
     };
+    
+    useEffect(() => {
+        const source = new EventSource('http://127.0.0.1:8090/stream');
+        source.onmessage = function(event) {
+          console.log("HEELLLNA")
+          
+          const g = JSON.parse(event.data)
+          console.log(g);
+          setMess(g);
+          //setToggleData([mess.room_id, mess.appliances[0].app_id, mess.appliances[0].value, mess.appliances[0].app_type])
+          // DevicesAPI.setStateDevice(mess.room_id,mess.appliances[0].app_id,mess.appliances[0].value,mess.appliances[0].app_type)
+        };
+        // DevicesAPI.setStateDevice(mess.room_id,mess.appliances[0].app_id,mess.appliances[0].value,mess.appliances[0].app_type)
+        return () => {
+        
+          source.close();
+        };
+      },[]);  // Empty dependency array means this effect runs once on mount and clean up on unmount
 
     useEffect(() => {
+        // console.log("4")
         const getData = async () => {
             const res = await getAllRoomsData();
             setData(res);
@@ -135,27 +155,35 @@ function Dashboard() {
     }, [triggerRender]);
 
     useEffect(() => {
+        console.log("3")
         const getData = async () => {
             const res = await getDevicesOfRoom(selectedRoom);
+            
             if (selectedRoom !== "0") setDevicesData(res);
         };
         getData();
     }, [selectedRoom, count]);
 
     useEffect(() => {
+        console.log("2")
         if (toggleData) {
             const toggle = async () => {
+                console.log("example")
+                console.log(toggleData)
                 const res = await toggleDevice(toggleData[0], toggleData[1], toggleData[2], toggleData[3]);
-                if (res) {
-                    setTimeout(() => setCount((count + 1) % 2), 1000);
-                }
+                // if (res) {
+                //     setTimeout(() => setCount((count + 1) % 2), 10);
+
+                // }
+                setCount((count + 1) % 2)
             };
             toggle();
         }
     }, [toggleData]);
 
     useEffect(() => {
-        setTimeout(() => setCount((count + 1) % 2), 1000);
+        // console.log("1")
+        setTimeout(() => setCount((count + 1) % 2), 10);
     }, [triggerRender]);
 
     const theme = useTheme();
