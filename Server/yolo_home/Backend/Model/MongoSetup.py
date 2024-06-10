@@ -15,7 +15,7 @@ def hash_password(password: str):
     pwhash = hashlib.pbkdf2_hmac('sha512',password.encode('utf-8'),salt,100000)
     pwhash = binascii.hexlify(pwhash)
     return (salt + pwhash).decode('ascii')
-
+uri = 'mongodb+srv://minhdangquocminh03:da232@cluster0.28iompk.mongodb.net/'
 client = MongoClient(uri, server_api=ServerApi('1'))
 db = client.get_database('SmartHome')
 records = db.Log
