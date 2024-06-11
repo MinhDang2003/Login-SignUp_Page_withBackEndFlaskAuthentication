@@ -94,7 +94,10 @@ function Home() {
 			console.log(error);
 		}
 	};
-
+	const closePopup = () => {
+		setPopupMessage(null); // Close the popup
+		hasPopupShown.current = true; // Reset the flag
+	};
 	// Add a new state variable
 	// Add a new state variable
 	// Replace useState with useRef
@@ -102,7 +105,7 @@ function Home() {
 
 	const checkConditions = () => {
 		let warningMessages = []; // Array to hold warning messages
-
+		console.log(hasPopupShown.current);
         if (currentTemperature > 40) {
             if (!hasPopupShown.current) {
                 warningMessages.push("Warning: Temperature is above 40°C");
@@ -133,7 +136,6 @@ function Home() {
 
         if (warningMessages.length > 0) {
             setPopupMessage(warningMessages.join("<br />")); // Join warning messages with a newline
-            hasPopupShown.current = true;
         } else {
             setPopupMessage(null);
         }
@@ -355,12 +357,12 @@ function Home() {
 				<Popup
 					open={true}
 					closeOnDocumentClick
-					onClose={() => setPopupMessage(null)}
+					onClose={closePopup}
 				>
 					<div style={styles.modal}>
 						<button
 							style={styles.closeButton}
-							onClick={() => setPopupMessage(null)}
+							onClick={closePopup}
 						>
 							×
 						</button>
