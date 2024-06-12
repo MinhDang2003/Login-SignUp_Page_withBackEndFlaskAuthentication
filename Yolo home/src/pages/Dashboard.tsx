@@ -83,7 +83,6 @@ const styles = {
 };
 
 function Dashboard() {
-    const [mess,setMess] = useState(null)
     const [inputs, setInputs] = useState({});
     const [triggerRender, setTriggerRender] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -126,16 +125,14 @@ function Dashboard() {
     
     useEffect(() => {
         const source = new EventSource('http://127.0.0.1:8090/stream');
-        source.onmessage = function(event) {
-          console.log("HEELLLNA")
-          
-          const g = JSON.parse(event.data)
-          console.log(g);
-          setMess(g);
-          //setToggleData([mess.room_id, mess.appliances[0].app_id, mess.appliances[0].value, mess.appliances[0].app_type])
-          // DevicesAPI.setStateDevice(mess.room_id,mess.appliances[0].app_id,mess.appliances[0].value,mess.appliances[0].app_type)
+        
+        
+        source.onmessage = function() {
+            setTimeout(() => setCount(prevCount => (prevCount + 1) % 2), 1000);
+            
+            console.log((count + 1) % 2)
+          console.log(count)
         };
-        // DevicesAPI.setStateDevice(mess.room_id,mess.appliances[0].app_id,mess.appliances[0].value,mess.appliances[0].app_type)
         return () => {
         
           source.close();
@@ -143,7 +140,7 @@ function Dashboard() {
       },[]);  // Empty dependency array means this effect runs once on mount and clean up on unmount
 
     useEffect(() => {
-        // console.log("4")
+        console.log("4")
         const getData = async () => {
             const res = await getAllRoomsData();
             setData(res);
@@ -155,11 +152,11 @@ function Dashboard() {
     }, [triggerRender]);
 
     useEffect(() => {
-        console.log("3")
+        console.log("9999")
         const getData = async () => {
             const res = await getDevicesOfRoom(selectedRoom);
-            
-            if (selectedRoom !== "0") setDevicesData(res);
+            console.log(res)
+            setDevicesData(res);
         };
         getData();
     }, [selectedRoom, count]);
@@ -171,20 +168,15 @@ function Dashboard() {
                 console.log("example")
                 console.log(toggleData)
                 const res = await toggleDevice(toggleData[0], toggleData[1], toggleData[2], toggleData[3]);
-                // if (res) {
-                //     setTimeout(() => setCount((count + 1) % 2), 10);
+                if (res) {
+                    setTimeout(() => setCount((count + 1) % 2), 1000);
 
-                // }
-                setCount((count + 1) % 2)
+                }
             };
             toggle();
         }
     }, [toggleData]);
 
-    useEffect(() => {
-        // console.log("1")
-        setTimeout(() => setCount((count + 1) % 2), 10);
-    }, [triggerRender]);
 
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);

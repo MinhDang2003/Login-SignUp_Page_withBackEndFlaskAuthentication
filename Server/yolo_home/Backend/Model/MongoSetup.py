@@ -277,7 +277,7 @@ class MongoAPI():
     
     @classmethod
     def updateFeedID(cls,feedID,value):
-        rooms.find_one_and_update({"appliances": {"$elemMatch": {"feed_id": feedID}}},{"$set": {"appliances.$.value": value}},return_document=ReturnDocument.AFTER)
+        rooms.find_one_and_update({"appliances": {"$elemMatch": {"feed_id": feedID}}},{"$set": {"appliances.$.value": int(value)}},return_document=ReturnDocument.AFTER)
         result = rooms.find_one(
             {"appliances": {"$elemMatch": {"feed_id": feedID}}},
             {"_id": 0 , "room_id": 1, "appliances.$": 1}

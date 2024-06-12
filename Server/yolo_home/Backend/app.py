@@ -39,7 +39,6 @@ class PrintHello(threading.Thread):
         self.ada.client.disconnect()
         self.running = False
 def stop_thread():
-    print("I M HETTTTT")
     thread.stop()
     thread.join()
     if thread.is_alive():
@@ -69,7 +68,6 @@ data = None
 app.config["JWT_SECRET_KEY"] = b"6hc/_gsh,./;2ZZx3c6_s,1//"
 
 jwt = JWTManager(app)
-
 def _build_cors_preflight_response():
     response = make_response()
     response.headers.add("Access-Control-Allow-Origin", "*")
@@ -203,6 +201,6 @@ def uploadImg():
 def verify():
     return Presenter.verify()
 if __name__ == "__main__":
-    app.run(debug=True,port=8090)
+    app.run(port=8090)
         
     

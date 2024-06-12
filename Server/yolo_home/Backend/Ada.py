@@ -6,7 +6,7 @@ import requests
 from flask import  jsonify
 from bson.json_util import dumps
 from Model.MongoSetup import *
-ADAFRUIT_IO_KEY = 'aio_Upqa21YnVbHGIOrmg4VuofFncSqf'
+ADAFRUIT_IO_KEY = 'aio_OFbU85LInhg2WpJ6kE1VO2T0kfJS'
 ADAFRUIT_IO_USERNAME = 'grassni'
 ADAFRUIT_IO_URL = 'io.adafruit.com'
 
